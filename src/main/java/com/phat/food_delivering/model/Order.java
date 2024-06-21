@@ -2,6 +2,7 @@ package com.phat.food_delivering.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Past;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,13 +23,17 @@ public class Order {
     private long id;
 
     @ManyToOne
+    @JoinColumn(name = "customer_id", referencedColumnName = "id")
     private User customer;
 
     @JsonIgnore
     @ManyToOne
+    @JoinColumn(name = "restaurant_id", referencedColumnName = "id")
     private Restaurant restaurant;
     private Long totalAmount;
     private String orderStatus;
+
+    @Past(message = "date can not is in the past")
     private Date createAt;
 
     @ManyToOne
