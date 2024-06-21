@@ -2,6 +2,7 @@ package com.phat.food_delivering.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,11 +21,13 @@ public class CartItem {
 
     @JsonIgnore
     @ManyToOne
+    @JoinColumn(name = "cart_id", referencedColumnName = "id")
     private Cart cart;
 
     @ManyToOne
     private Food food;
 
+    @Size(min = 0)
     private int quantity;
     private List<String> ingredients;
     private Long totalPrice;

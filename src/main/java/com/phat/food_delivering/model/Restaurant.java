@@ -2,9 +2,11 @@ package com.phat.food_delivering.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -21,6 +23,9 @@ public class Restaurant {
 
     @OneToOne
     private User owner;
+
+    @NotBlank(message = "Name of restaurant can not be blank")
+    @NonNull
     private String name;
     private String description;
     private String cuisineType;
