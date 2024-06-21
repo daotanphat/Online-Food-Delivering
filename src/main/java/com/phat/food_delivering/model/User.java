@@ -3,9 +3,11 @@ package com.phat.food_delivering.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.phat.food_delivering.dto.RestaurantDTO;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,10 +21,25 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+    @NotBlank(message = "Name of user can not be blank")
+    @NonNull
+    @Column(nullable = false)
     private String fullName;
+
+    @NotBlank(message = "Email can not be blank")
+    @NonNull
+    @Column(nullable = false, unique = true)
     private String email;
+
+    @NotBlank(message = "Password can not be blank")
+    @NonNull
+    @Column(nullable = false)
     private String password;
-    private USER_ROLE role = USER_ROLE.ROLE_CUSTOMER;
+
+    @Column(nullable = false)
+    @NonNull
+    private USER_ROLE role = USER_ROLE.CUSTOMER;
 
     @JsonIgnore
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
