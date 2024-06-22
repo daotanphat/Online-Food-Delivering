@@ -50,7 +50,6 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                 .withClaim("authorities", roles)
                 .withExpiresAt(new Date(System.currentTimeMillis() + SecurityConstants.TOKEN_EXPIRATION))
                 .sign(Algorithm.HMAC512(SecurityConstants.SECRET_KEY));
-        System.out.println(token);
         response.addHeader(SecurityConstants.HEADER, SecurityConstants.BEARER + token);
     }
 
