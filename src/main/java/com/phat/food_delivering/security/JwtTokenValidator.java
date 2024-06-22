@@ -1,4 +1,4 @@
-package com.phat.food_delivering.config;
+package com.phat.food_delivering.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -21,15 +21,15 @@ import java.util.List;
 public class JwtTokenValidator extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String header = request.getHeader(JwtConstants.HEADER);
-        if (header == null || !header.startsWith(JwtConstants.BEARER)) {
+        String header = request.getHeader(SecurityConstants.HEADER);
+        if (header == null || !header.startsWith(SecurityConstants.BEARER)) {
             filterChain.doFilter(request, response);
             return;
         }
-        String token = header.replace(JwtConstants.BEARER, "");
+        String token = header.replace(SecurityConstants.BEARER, "");
 
         try {
-            SecretKey secretKey = Keys.hmacShaKeyFor(JwtConstants.SECRET_KEY.getBytes());
+            SecretKey secretKey = Keys.hmacShaKeyFor(SecurityConstants.SECRET_KEY.getBytes());
             Claims claims = Jwts.parserBuilder()
                     .setSigningKey(secretKey)
                     .build()
