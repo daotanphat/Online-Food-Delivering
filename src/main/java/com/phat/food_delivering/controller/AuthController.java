@@ -1,17 +1,13 @@
 package com.phat.food_delivering.controller;
 
-import com.phat.food_delivering.security.JwtProvider;
 import com.phat.food_delivering.model.Cart;
 import com.phat.food_delivering.model.User;
-import com.phat.food_delivering.response.AuthResponse;
 import com.phat.food_delivering.service.CartService;
-import com.phat.food_delivering.service.CustomUserDetailService;
 import com.phat.food_delivering.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
