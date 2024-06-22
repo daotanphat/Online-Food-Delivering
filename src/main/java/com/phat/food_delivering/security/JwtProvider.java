@@ -1,4 +1,4 @@
-package com.phat.food_delivering.config;
+package com.phat.food_delivering.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -12,7 +12,7 @@ import java.util.*;
 
 @Service
 public class JwtProvider {
-    private SecretKey secretKey = Keys.hmacShaKeyFor(JwtConstants.SECRET_KEY.getBytes());
+    private SecretKey secretKey = Keys.hmacShaKeyFor(SecurityConstants.SECRET_KEY.getBytes());
 
     public String generateToken(Authentication authentication) {
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
@@ -20,7 +20,7 @@ public class JwtProvider {
 
         String jwt = Jwts.builder()
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(new Date().getTime() + JwtConstants.TOKEN_EXPIRATION))
+                .setExpiration(new Date(new Date().getTime() + SecurityConstants.TOKEN_EXPIRATION))
                 .claim("email", authentication.getName())
                 .claim("authorities", roles)
                 .signWith(secretKey)
@@ -30,7 +30,7 @@ public class JwtProvider {
     }
 
     public String getEmailFromJwtTokem(String token) {
-        token = token.replace(JwtConstants.BEARER, "");
+        token = token.replace(SecurityConstants.BEARER, "");
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(secretKey)
                 .build()
