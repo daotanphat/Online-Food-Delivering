@@ -37,10 +37,9 @@ public class SecurityConfig {
                         .requestMatchers("api/**").authenticated()
                         .requestMatchers(HttpMethod.POST, SecurityConstants.AUTH_PATH).permitAll()
                         .anyRequest().permitAll())
-                //.addFilterBefore(new JwtTokenValidator(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new ExceptionHandlerFilter(), AuthenticationFilter.class)
                 .addFilter(authenticationFilter)
-                //.addFilterAfter(new JwtAuthorizationFilter(), AuthenticationFilter.class)
+                .addFilterAfter(new JwtAuthorizationFilter(), AuthenticationFilter.class)
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()));
         return http.build();
