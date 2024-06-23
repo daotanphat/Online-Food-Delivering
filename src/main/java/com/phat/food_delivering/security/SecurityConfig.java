@@ -30,17 +30,20 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         AuthenticationFilter authenticationFilter = new AuthenticationFilter(customAuthenticationManager);
         authenticationFilter.setFilterProcessesUrl("/login");
-
-        http.sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        http
+                .headers(headers -> headers.frameOptions(frameOption -> frameOption.disable()))
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("api/admin/**").hasAnyRole(String.valueOf(USER_ROLE.ADMIN), String.valueOf(USER_ROLE.RESTAURANT_OWNER))
-                        .requestMatchers("api/**").authenticated()
+                        .requestMatchers("/h2/**").permitAll()
+                        .requestMatchers("api/admin/**").hasAnyAuthority("ADMIN", "RESTAURANT_OWNER")
+                        //.requestMatchers("api/**").authenticated()
+                        .requestMatchers("api/user/**").hasAuthority("CUSTOMER")
                         .requestMatchers(HttpMethod.POST, SecurityConstants.AUTH_PATH).permitAll()
                         .anyRequest().permitAll())
                 .addFilterBefore(new ExceptionHandlerFilter(), AuthenticationFilter.class)
                 .addFilter(authenticationFilter)
                 .addFilterAfter(new JwtAuthorizationFilter(), AuthenticationFilter.class)
-                .csrf(csrf -> csrf.disable())
+                .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()));
         return http.build();
     }
