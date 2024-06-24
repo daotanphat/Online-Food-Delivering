@@ -1,6 +1,7 @@
 package com.phat.food_delivering.service;
 
 import com.phat.food_delivering.dto.RestaurantDTO;
+import com.phat.food_delivering.exception.EntityNotFoundException;
 import com.phat.food_delivering.model.Address;
 import com.phat.food_delivering.model.Restaurant;
 import com.phat.food_delivering.model.User;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RestaurantServiceImpl implements RestaurantService {
@@ -67,8 +69,9 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
-    public Restaurant findRestaurantById(Long id) throws Exception {
-        return restaurantRepository.findById(id).get();
+    public Restaurant findRestaurantById(Long id) {
+        Optional<Restaurant> restaurant = restaurantRepository.findById(id);
+        return unwrapRestaurant(restaurant, id);
     }
 
     @Override
@@ -85,8 +88,8 @@ public class RestaurantServiceImpl implements RestaurantService {
         restaurantDTO.setDescription(restaurant.getDescription());
         restaurantDTO.setImages(restaurant.getImages());
 
-        if (user.getFavorites().contains(restaurantDTO)) {
-            user.getFavorites().remove(restaurantDTO);
+        if (user.getFavorites().stream().anyMatch(r -> r.getId().equals(restaurantDTO.getId()))) {
+            user.getFavorites().removeIf(r -> r.getId().equals(restaurantDTO.getId()));
         } else {
             user.getFavorites().add(restaurantDTO);
         }
@@ -100,5 +103,13 @@ public class RestaurantServiceImpl implements RestaurantService {
         Restaurant restaurant = findRestaurantById(restaurantId);
         restaurant.setOpen(!restaurant.isOpen());
         return restaurantRepository.save(restaurant);
+    }
+
+    static Restaurant unwrapRestaurant(Optional<Restaurant> entity, Long id) {
+        if (entity.isPresent()) {
+            return entity.get();
+        } else {
+            throw new EntityNotFoundException(Restaurant.class, id);
+        }
     }
 }
