@@ -45,7 +45,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
-    public Restaurant updateRestaurant(CreateRestaurantRequest req, Long id) throws Exception {
+    public Restaurant updateRestaurant(CreateRestaurantRequest req, Long id){
         Restaurant restaurant = findRestaurantById(id);
         restaurant.setName(req.getName());
         restaurant.setDescription(req.getDescription());
@@ -54,7 +54,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
-    public void deleteRestaurant(Long id) throws Exception {
+    public void deleteRestaurant(Long id){
         restaurantRepository.deleteById(id);
     }
 
@@ -75,12 +75,12 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
-    public Restaurant findRestaurantByUserId(Long userId) throws Exception {
+    public Restaurant findRestaurantByUserId(Long userId){
         return restaurantRepository.findByOwnerId(userId);
     }
 
     @Override
-    public RestaurantDTO addToFavorite(Long restaurantId, User user) throws Exception {
+    public RestaurantDTO addToFavorite(Long restaurantId, User user){
         Restaurant restaurant = findRestaurantById(restaurantId);
         RestaurantDTO restaurantDTO = new RestaurantDTO();
         restaurantDTO.setId(restaurant.getId());
@@ -99,7 +99,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
-    public Restaurant updateRestaurantStatus(Long restaurantId) throws Exception {
+    public Restaurant updateRestaurantStatus(Long restaurantId){
         Restaurant restaurant = findRestaurantById(restaurantId);
         restaurant.setOpen(!restaurant.isOpen());
         return restaurantRepository.save(restaurant);
