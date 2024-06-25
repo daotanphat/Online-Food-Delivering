@@ -10,19 +10,19 @@ import java.util.List;
 public interface RestaurantService {
     public Restaurant createRestaurant(CreateRestaurantRequest req, User user);
 
-    public Restaurant updateRestaurant(CreateRestaurantRequest req, Long id) throws Exception;
+    public Restaurant updateRestaurant(CreateRestaurantRequest req, Long id);
 
-    public void deleteRestaurant(Long id) throws Exception;
+    public void deleteRestaurant(Long id);
 
     public List<Restaurant> getAllRestaurants();
 
     public List<Restaurant> searchRestaurant(String key);
 
-    public Restaurant findRestaurantById(Long id) throws Exception;
+    public Restaurant findRestaurantById(Long id);
 
-    public Restaurant findRestaurantByUserId(Long userId) throws Exception;
+    public Restaurant findRestaurantByUserId(Long userId);
 
-    public RestaurantDTO addToFavorite(Long restaurantId, User user) throws Exception;
+    public RestaurantDTO addToFavorite(Long restaurantId, User user);
 
-    public Restaurant updateRestaurantStatus(Long restaurantId) throws Exception;
+    public Restaurant updateRestaurantStatus(Long restaurantId);
 }
