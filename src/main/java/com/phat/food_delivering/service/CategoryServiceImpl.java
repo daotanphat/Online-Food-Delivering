@@ -26,7 +26,7 @@ public class CategoryServiceImpl implements CategoryService {
         category.setName(request.getName());
         category.setDescription(request.getDescription());
         category.setRestaurant(restaurant);
-        return category;
+        return categoryRepository.save(category);
     }
 
     @Override
