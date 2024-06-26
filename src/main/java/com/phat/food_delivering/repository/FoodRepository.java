@@ -12,8 +12,6 @@ import java.util.Optional;
 
 @Repository
 public interface FoodRepository extends JpaRepository<Food, Long> {
-    Food updateById(Long id);
-
     void deleteById(Long id);
 
     Optional<Food> getFoodById(Long id);
