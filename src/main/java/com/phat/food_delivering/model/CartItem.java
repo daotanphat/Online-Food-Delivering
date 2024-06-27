@@ -27,7 +27,7 @@ public class CartItem {
     @ManyToOne
     private Food food;
 
-    @Size(min = 0)
+//    @Size(min = 0)
     private int quantity;
     private List<String> ingredients;
     private Long totalPrice;
