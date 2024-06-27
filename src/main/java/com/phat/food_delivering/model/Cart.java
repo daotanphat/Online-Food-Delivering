@@ -1,5 +1,6 @@
 package com.phat.food_delivering.model;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,6 +20,7 @@ public class Cart {
     private Long id;
 
     @OneToOne
+    @JoinColumn(name = "customer_id", referencedColumnName = "id", nullable = false)
     private User customer;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
