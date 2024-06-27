@@ -3,27 +3,40 @@ package com.phat.food_delivering.service;
 import com.phat.food_delivering.exception.EntityNotFoundException;
 import com.phat.food_delivering.model.Category;
 import com.phat.food_delivering.model.Food;
+import com.phat.food_delivering.model.IngredientsItem;
 import com.phat.food_delivering.model.Restaurant;
+import com.phat.food_delivering.repository.CategoryRepository;
 import com.phat.food_delivering.repository.FoodRepository;
 import com.phat.food_delivering.request.CreateFoodRequest;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class FoodServiceImpl implements FoodService {
-    @Autowired
     FoodRepository foodRepository;
+    IngredientService ingredientService;
+    CategoryRepository categoryRepository;
 
     @Override
     public Food createFood(CreateFoodRequest request, Category category, Restaurant restaurant) {
         Food food = new Food();
-        food.setId(request.getId());
+        IngredientsItem ingredientsItem = new IngredientsItem();
+        categoryRepository.save(category);
+        List<IngredientsItem> ingredientsItems = new ArrayList<>();
+        for (Long itemId : request.getIngredients()) {
+            ingredientsItem = ingredientService.getIngredientItemById(itemId);
+            ingredientsItems.add(ingredientsItem);
+        }
+
         food.setName(request.getName());
         food.setDescription(request.getDescription());
         food.setPrice(request.getPrice());
@@ -33,7 +46,7 @@ public class FoodServiceImpl implements FoodService {
         food.setRestaurant(restaurant);
         food.setVegetarian(request.isVegetarian());
         food.setSeasonal(request.isSeasonal());
-        food.setIngredients(request.getIngredients());
+        food.setIngredients(ingredientsItems);
         food.setCreationDate(new Date(new Date().getTime()));
 
         return foodRepository.save(food);
@@ -42,6 +55,13 @@ public class FoodServiceImpl implements FoodService {
     @Override
     public Food updateFood(CreateFoodRequest request, Category category, Restaurant restaurant, Long id) {
         Food food = getFoodById(id);
+        IngredientsItem ingredientsItem = new IngredientsItem();
+        List<IngredientsItem> ingredientsItems = new ArrayList<>();
+        for (Long itemId : request.getIngredients()) {
+            ingredientsItem = ingredientService.getIngredientItemById(itemId);
+            ingredientsItems.add(ingredientsItem);
+        }
+
         food.setName(request.getName());
         food.setDescription(request.getDescription());
         food.setPrice(request.getPrice());
@@ -50,7 +70,7 @@ public class FoodServiceImpl implements FoodService {
         food.setAvailable(request.isAvailable());
         food.setVegetarian(request.isVegetarian());
         food.setSeasonal(request.isSeasonal());
-        food.setIngredients(request.getIngredients());
+        food.setIngredients(ingredientsItems);
         return foodRepository.save(food);
     }
 
