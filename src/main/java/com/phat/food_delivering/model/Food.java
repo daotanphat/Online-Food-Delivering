@@ -27,7 +27,7 @@ public class Food {
     private String name;
     private String description;
 
-    @Size(min = 0)
+    //@Size(min = 0)
     private Long price;
 
     @ManyToOne
@@ -45,7 +45,7 @@ public class Food {
     private boolean isVegetarian;
     private boolean isSeasonal;
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "foods")
     private List<IngredientsItem> ingredients = new ArrayList<>();
 
     @Past(message = "Date can not be in the past")
