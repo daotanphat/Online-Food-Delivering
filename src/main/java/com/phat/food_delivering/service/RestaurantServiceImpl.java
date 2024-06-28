@@ -28,7 +28,11 @@ public class RestaurantServiceImpl implements RestaurantService {
 
     @Override
     public Restaurant createRestaurant(CreateRestaurantRequest req, User user) {
-        Address address = addressService.save(req.getAddress());
+        List<Address> addresses = addressService.getAddresses();
+        Address address = new Address();
+        if (!addressService.checkDuplicateAddress(address, addresses)) {
+            address = addressService.save(req.getAddress());
+        }
         Restaurant restaurant = new Restaurant();
 
         restaurant.setName(req.getName());
@@ -45,7 +49,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
-    public Restaurant updateRestaurant(CreateRestaurantRequest req, Long id){
+    public Restaurant updateRestaurant(CreateRestaurantRequest req, Long id) {
         Restaurant restaurant = findRestaurantById(id);
         restaurant.setName(req.getName());
         restaurant.setDescription(req.getDescription());
@@ -54,7 +58,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
-    public void deleteRestaurant(Long id){
+    public void deleteRestaurant(Long id) {
         restaurantRepository.deleteById(id);
     }
 
@@ -75,12 +79,12 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
-    public Restaurant findRestaurantByUserId(Long userId){
+    public Restaurant findRestaurantByUserId(Long userId) {
         return restaurantRepository.findByOwnerId(userId);
     }
 
     @Override
-    public RestaurantDTO addToFavorite(Long restaurantId, User user){
+    public RestaurantDTO addToFavorite(Long restaurantId, User user) {
         Restaurant restaurant = findRestaurantById(restaurantId);
         RestaurantDTO restaurantDTO = new RestaurantDTO();
         restaurantDTO.setId(restaurant.getId());
@@ -99,7 +103,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
-    public Restaurant updateRestaurantStatus(Long restaurantId){
+    public Restaurant updateRestaurantStatus(Long restaurantId) {
         Restaurant restaurant = findRestaurantById(restaurantId);
         restaurant.setOpen(!restaurant.isOpen());
         return restaurantRepository.save(restaurant);
