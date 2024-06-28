@@ -23,7 +23,7 @@ public class OrderItem {
     @ManyToOne
     private Food food;
 
-    @Size(min = 0)
+    //@Size(min = 0)
     @NonNull
     private int quantity;
     private Long totalPrice;
