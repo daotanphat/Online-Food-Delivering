@@ -25,6 +25,7 @@ public class IngredientsItem {
     private String name;
 
     @ManyToOne
+    @JoinColumn(name = "category_id")
     private IngredientCategory category;
 
     @JsonIgnore
