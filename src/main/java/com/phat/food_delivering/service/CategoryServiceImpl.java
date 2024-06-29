@@ -1,5 +1,6 @@
 package com.phat.food_delivering.service;
 
+import com.phat.food_delivering.dto.RestaurantDTOO;
 import com.phat.food_delivering.exception.EntityNotFoundException;
 import com.phat.food_delivering.model.Category;
 import com.phat.food_delivering.model.Restaurant;
@@ -22,7 +23,8 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Category createCategory(CreateCategoryRequest request, Long userId) {
         Category category = new Category();
-        Restaurant restaurant = restaurantService.findRestaurantByUserId(userId);
+        RestaurantDTOO restaurantDTOO = restaurantService.findRestaurantByUserId(userId);
+        Restaurant restaurant = restaurantService.findRestaurantById(restaurantDTOO.id());
         category.setName(request.getName());
         category.setDescription(request.getDescription());
         category.setRestaurant(restaurant);
