@@ -36,7 +36,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/h2/**").permitAll()
                         .requestMatchers("api/admin/**").hasAnyAuthority("ADMIN", "RESTAURANT_OWNER")
-                        .requestMatchers("api/**").authenticated()
+                        //.requestMatchers("api/**").authenticated()
                         .requestMatchers("api/user/**").hasAuthority("CUSTOMER")
                         .requestMatchers(HttpMethod.POST, SecurityConstants.AUTH_PATH).permitAll()
                         .anyRequest().authenticated())
