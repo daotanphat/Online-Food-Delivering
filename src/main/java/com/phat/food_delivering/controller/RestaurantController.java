@@ -1,6 +1,8 @@
 package com.phat.food_delivering.controller;
 
 import com.phat.food_delivering.dto.RestaurantDTO;
+import com.phat.food_delivering.dto.RestaurantDTOMapper;
+import com.phat.food_delivering.dto.RestaurantDTOO;
 import com.phat.food_delivering.model.Restaurant;
 import com.phat.food_delivering.model.User;
 import com.phat.food_delivering.security.SecurityConstants;
@@ -15,32 +17,35 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/user/restaurant")
-public class CustomerRestaurantController {
+public class RestaurantController {
+    private final RestaurantDTOMapper restaurantDTOMapper;
     RestaurantService restaurantService;
     UserService userService;
 
     @Autowired
-    public CustomerRestaurantController(RestaurantService restaurantService, UserService userService) {
+    public RestaurantController(RestaurantService restaurantService, UserService userService, RestaurantDTOMapper restaurantDTOMapper) {
         this.restaurantService = restaurantService;
         this.userService = userService;
+        this.restaurantDTOMapper = restaurantDTOMapper;
     }
 
     @GetMapping
-    public ResponseEntity<List<Restaurant>> getRestaurants() {
-        List<Restaurant> restaurants = restaurantService.getAllRestaurants();
+    public ResponseEntity<List<RestaurantDTOO>> getRestaurants() {
+        List<RestaurantDTOO> restaurants = restaurantService.getAllRestaurants();
         return new ResponseEntity<>(restaurants, HttpStatus.OK);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Restaurant>> findRestaurantBasedOnSearch(@RequestParam String search) {
-        List<Restaurant> restaurants = restaurantService.searchRestaurant(search);
+    public ResponseEntity<List<RestaurantDTOO>> findRestaurantBasedOnSearch(@RequestParam String search) {
+        List<RestaurantDTOO> restaurants = restaurantService.searchRestaurant(search);
         return new ResponseEntity<>(restaurants, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Restaurant> findRestaurantBasedOnId(@PathVariable Long id) throws Exception {
+    public ResponseEntity<RestaurantDTOO> findRestaurantBasedOnId(@PathVariable Long id) throws Exception {
         Restaurant restaurant = restaurantService.findRestaurantById(id);
-        return new ResponseEntity<>(restaurant, HttpStatus.OK);
+        RestaurantDTOO restaurantDTOO = restaurantDTOMapper.apply(restaurant);
+        return new ResponseEntity<>(restaurantDTOO, HttpStatus.OK);
     }
 
     @PutMapping("/add-favorites/{id}")

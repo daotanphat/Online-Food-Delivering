@@ -1,18 +1,23 @@
 package com.phat.food_delivering.service;
 
+import com.phat.food_delivering.dto.AddressDTOMapper;
 import com.phat.food_delivering.dto.RestaurantDTO;
+import com.phat.food_delivering.dto.RestaurantDTOMapper;
+import com.phat.food_delivering.dto.RestaurantDTOO;
 import com.phat.food_delivering.exception.EntityNotFoundException;
-import com.phat.food_delivering.model.Address;
-import com.phat.food_delivering.model.Restaurant;
-import com.phat.food_delivering.model.User;
+import com.phat.food_delivering.model.*;
+import com.phat.food_delivering.repository.OrderItemRepository;
+import com.phat.food_delivering.repository.OrderRepository;
 import com.phat.food_delivering.repository.RestaurantRepository;
-import com.phat.food_delivering.request.CreateRestaurantRequest;
+import com.phat.food_delivering.request.AddressRequest;
+import com.phat.food_delivering.request.RestaurantRequest;
+import com.phat.food_delivering.security.SecurityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class RestaurantServiceImpl implements RestaurantService {
@@ -26,30 +31,36 @@ public class RestaurantServiceImpl implements RestaurantService {
     @Autowired
     AddressService addressService;
 
-    @Override
-    public Restaurant createRestaurant(CreateRestaurantRequest req, User user) {
-        List<Address> addresses = addressService.getAddresses();
-        Address address = new Address();
-        if (!addressService.checkDuplicateAddress(address, addresses)) {
-            address = addressService.save(req.getAddress());
-        }
-        Restaurant restaurant = new Restaurant();
+    @Autowired
+    RestaurantDTOMapper restaurantDTOMapper;
 
-        restaurant.setName(req.getName());
-        restaurant.setDescription(req.getDescription());
-        restaurant.setCuisineType(req.getCuisineType());
-        restaurant.setAddress(address);
-        restaurant.setContactInformation(req.getContactInformation());
-        restaurant.setOpeningHours(req.getOpeningHours());
-        restaurant.setRegistrationDate(LocalDateTime.now());
-        restaurant.setImages(req.getImages());
-        restaurant.setOwner(user);
+    @Autowired
+    AddressDTOMapper addressDTOMapper;
+
+    @Autowired
+    OrderItemRepository orderItemRepository;
+    @Autowired
+    private OrderRepository orderRepository;
+
+    @Override
+    public Restaurant createRestaurant(RestaurantRequest restaurantRequest, String token) {
+        token = token.replace(SecurityConstants.BEARER, "");
+        User user = userService.findUserBasedOnToken(token);
+
+        List<Address> addresses = addressService.getAddresses();
+        Address address = restaurantRequest.getAddress();
+        if (!addressService.checkDuplicateAddress(address, addresses)) {
+            address = addressService.save(restaurantRequest.getAddress());
+        } else {
+            address = addressService.findAddress(address);
+        }
+        Restaurant restaurant = restaurantDTOMapper.toRestaurant(restaurantRequest, user, address);
 
         return restaurantRepository.save(restaurant);
     }
 
     @Override
-    public Restaurant updateRestaurant(CreateRestaurantRequest req, Long id) {
+    public Restaurant updateRestaurant(RestaurantRequest req, Long id) {
         Restaurant restaurant = findRestaurantById(id);
         restaurant.setName(req.getName());
         restaurant.setDescription(req.getDescription());
@@ -59,28 +70,44 @@ public class RestaurantServiceImpl implements RestaurantService {
 
     @Override
     public void deleteRestaurant(Long id) {
+        Restaurant restaurant = findRestaurantById(id);
+        List<Food> foods = restaurant.getFoods();
+        if (!foods.isEmpty()) {
+            for (Food food : foods) {
+                for (OrderItem orderItem : food.getOrderItems()) {
+                    orderRepository.deleteById(orderItem.getId());
+                }
+            }
+        }
         restaurantRepository.deleteById(id);
     }
 
     @Override
-    public List<Restaurant> getAllRestaurants() {
-        return restaurantRepository.findAll();
+    public List<RestaurantDTOO> getAllRestaurants() {
+        return restaurantRepository.findAll()
+                .stream()
+                .map(restaurantDTOMapper)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Restaurant> searchRestaurant(String key) {
-        return restaurantRepository.findBySearchQuery(key);
+    public List<RestaurantDTOO> searchRestaurant(String key) {
+        return restaurantRepository.findBySearchQuery(key)
+                .stream()
+                .map(restaurantDTOMapper)
+                .collect(Collectors.toList());
     }
 
     @Override
     public Restaurant findRestaurantById(Long id) {
-        Optional<Restaurant> restaurant = restaurantRepository.findById(id);
-        return unwrapRestaurant(restaurant, id);
+        Optional<Restaurant> restaurantOptional = restaurantRepository.findById(id);
+        return unwrapRestaurant(restaurantOptional, id);
     }
 
     @Override
-    public Restaurant findRestaurantByUserId(Long userId) {
-        return restaurantRepository.findByOwnerId(userId);
+    public RestaurantDTOO findRestaurantByUserId(Long userId) {
+        Restaurant restaurant = restaurantRepository.findByOwnerId(userId);
+        return restaurantDTOMapper.apply(restaurant);
     }
 
     @Override
@@ -103,10 +130,11 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
-    public Restaurant updateRestaurantStatus(Long restaurantId) {
+    public RestaurantDTOO updateRestaurantStatus(Long restaurantId) {
         Restaurant restaurant = findRestaurantById(restaurantId);
         restaurant.setOpen(!restaurant.isOpen());
-        return restaurantRepository.save(restaurant);
+        Restaurant savedRestaurant = restaurantRepository.save(restaurant);
+        return restaurantDTOMapper.apply(savedRestaurant);
     }
 
     static Restaurant unwrapRestaurant(Optional<Restaurant> entity, Long id) {

@@ -1,8 +1,10 @@
 package com.phat.food_delivering.controller;
 
+import com.phat.food_delivering.dto.RestaurantDTOO;
 import com.phat.food_delivering.model.Restaurant;
 import com.phat.food_delivering.model.User;
-import com.phat.food_delivering.request.CreateRestaurantRequest;
+import com.phat.food_delivering.request.AddressRequest;
+import com.phat.food_delivering.request.RestaurantRequest;
 import com.phat.food_delivering.response.MessageResponse;
 import com.phat.food_delivering.security.SecurityConstants;
 import com.phat.food_delivering.service.RestaurantService;
@@ -11,8 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/restaurants")
@@ -26,18 +26,16 @@ public class AdminRestaurantController {
 
     @PostMapping()
     public ResponseEntity<Restaurant> createRestaurant(
-            @RequestBody CreateRestaurantRequest req,
+            @RequestBody RestaurantRequest restaurantRequest,
             @RequestHeader("Authorization") String token
     ) {
-        token = token.replace(SecurityConstants.BEARER, "");
-        User user = userService.findUserBasedOnToken(token);
-        Restaurant restaurant = restaurantService.createRestaurant(req, user);
+        Restaurant restaurant = restaurantService.createRestaurant(restaurantRequest, token);
         return new ResponseEntity<>(restaurant, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Restaurant> updateRestaurant(
-            @RequestBody CreateRestaurantRequest req,
+            @RequestBody RestaurantRequest req,
             @PathVariable Long id
     ) throws Exception {
         Restaurant restaurant = restaurantService.updateRestaurant(req, id);
@@ -56,16 +54,16 @@ public class AdminRestaurantController {
     }
 
     @PutMapping("/status/{id}")
-    public ResponseEntity<Restaurant> updateRestaurantStatus(@PathVariable Long id) throws Exception {
-        Restaurant restaurant = restaurantService.updateRestaurantStatus(id);
-        return new ResponseEntity<>(restaurant, HttpStatus.OK);
+    public ResponseEntity<RestaurantDTOO> updateRestaurantStatus(@PathVariable Long id) throws Exception {
+        RestaurantDTOO restaurantDTOO = restaurantService.updateRestaurantStatus(id);
+        return new ResponseEntity<>(restaurantDTOO, HttpStatus.OK);
     }
 
     @GetMapping("/user")
-    public ResponseEntity<Restaurant> findRestaurantByUserId(@RequestHeader("Authorization") String token) throws Exception {
+    public ResponseEntity<RestaurantDTOO> findRestaurantByUserId(@RequestHeader("Authorization") String token) throws Exception {
         token = token.replace(SecurityConstants.BEARER, "");
         User user = userService.findUserBasedOnToken(token);
-        Restaurant restaurant = restaurantService.findRestaurantByUserId(user.getId());
-        return new ResponseEntity<>(restaurant, HttpStatus.OK);
+        RestaurantDTOO restaurantDTOO = restaurantService.findRestaurantByUserId(user.getId());
+        return new ResponseEntity<>(restaurantDTOO, HttpStatus.OK);
     }
 }
