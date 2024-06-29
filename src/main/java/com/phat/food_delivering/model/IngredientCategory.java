@@ -26,8 +26,10 @@ public class IngredientCategory {
 
     @JsonIgnore
     @ManyToOne
+    @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
-//    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-//    private List<IngredientsItem> ingredients = new ArrayList<>();
+    @JsonIgnore
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    private List<IngredientsItem> ingredients = new ArrayList<>();
 }
