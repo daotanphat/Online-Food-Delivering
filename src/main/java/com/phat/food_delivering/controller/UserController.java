@@ -1,5 +1,6 @@
 package com.phat.food_delivering.controller;
 
+import com.phat.food_delivering.dto.UserDTO;
 import com.phat.food_delivering.model.User;
 import com.phat.food_delivering.security.SecurityConstants;
 import com.phat.food_delivering.service.UserService;
@@ -28,8 +29,8 @@ public class UserController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userService.findAllUsers();
+    public ResponseEntity<List<UserDTO>> getAllUsers() {
+        List<UserDTO> users = userService.findAllUsers();
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 }
