@@ -25,9 +25,10 @@ public class CartItem {
     private Cart cart;
 
     @ManyToOne
+    @JoinColumn(name = "food_id")
     private Food food;
 
-//    @Size(min = 0)
+    //    @Size(min = 0)
     private int quantity;
     private List<String> ingredients;
     private Long totalPrice;
