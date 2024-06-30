@@ -1,5 +1,6 @@
 package com.phat.food_delivering.controller;
 
+import com.phat.food_delivering.dto.Mapper.CategoryDTO;
 import com.phat.food_delivering.model.Category;
 import com.phat.food_delivering.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/category")
-public class CustomerCategoryController {
+public class CategoryController {
     @Autowired
     CategoryService categoryService;
 
@@ -22,14 +23,14 @@ public class CustomerCategoryController {
     }
 
     @GetMapping("/restaurant/{restaurantId}")
-    public ResponseEntity<List<Category>> getCategoryByRestaurantId(@PathVariable Long restaurantId) {
-        List<Category> categories = categoryService.getCategoryByRestaurantId(restaurantId);
+    public ResponseEntity<List<CategoryDTO>> getCategoryByRestaurantId(@PathVariable Long restaurantId) {
+        List<CategoryDTO> categories = categoryService.getCategoryByRestaurantId(restaurantId);
         return new ResponseEntity<>(categories, HttpStatus.OK);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Category>> getCategoryBySearch(@RequestParam String search) {
-        List<Category> categories = categoryService.getCategoryBySearch(search);
+    public ResponseEntity<List<CategoryDTO>> getCategoryBySearch(@RequestParam String search) {
+        List<CategoryDTO> categories = categoryService.getCategoryBySearch(search);
         return new ResponseEntity<>(categories, HttpStatus.OK);
     }
 }

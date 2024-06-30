@@ -1,5 +1,6 @@
-package com.phat.food_delivering.controller;
+package com.phat.food_delivering.controller.Admin;
 
+import com.phat.food_delivering.dto.Mapper.CategoryDTO;
 import com.phat.food_delivering.model.Category;
 import com.phat.food_delivering.model.User;
 import com.phat.food_delivering.request.CreateCategoryRequest;
@@ -21,12 +22,10 @@ public class AdminCategoryController {
     UserService userService;
 
     @PostMapping
-    public ResponseEntity<Category> createCategory(
+    public ResponseEntity<CategoryDTO> createCategory(
             @RequestBody CreateCategoryRequest request,
             @RequestHeader("Authorization") String token) {
-        token = token.replace(SecurityConstants.BEARER, "");
-        User user = userService.findUserBasedOnToken(token);
-        Category category = categoryService.createCategory(request, user.getId());
+        CategoryDTO category = categoryService.createCategory(request, token);
         return new ResponseEntity<>(category, HttpStatus.CREATED);
     }
 }

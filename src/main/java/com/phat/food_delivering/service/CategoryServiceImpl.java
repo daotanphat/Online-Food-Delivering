@@ -1,34 +1,45 @@
 package com.phat.food_delivering.service;
 
+import com.phat.food_delivering.dto.Mapper.CategoryDTO;
+import com.phat.food_delivering.dto.Mapper.CategoryDTOMapper;
 import com.phat.food_delivering.dto.RestaurantDTOO;
 import com.phat.food_delivering.exception.EntityNotFoundException;
+import com.phat.food_delivering.exception.ListEntityNotFoundException;
 import com.phat.food_delivering.model.Category;
 import com.phat.food_delivering.model.Restaurant;
+import com.phat.food_delivering.model.User;
 import com.phat.food_delivering.repository.CategoryRepository;
 import com.phat.food_delivering.request.CreateCategoryRequest;
+import com.phat.food_delivering.response.MessageResponse;
+import com.phat.food_delivering.security.SecurityConstants;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
-    @Autowired
     CategoryRepository categoryRepository;
-
-    @Autowired
     RestaurantService restaurantService;
+    UserService userService;
+    CategoryDTOMapper categoryDTOMapper;
 
     @Override
-    public Category createCategory(CreateCategoryRequest request, Long userId) {
+    public CategoryDTO createCategory(CreateCategoryRequest request, String token) {
+        token = token.replace(SecurityConstants.BEARER, "");
+        User user = userService.findUserBasedOnToken(token);
+
         Category category = new Category();
-        RestaurantDTOO restaurantDTOO = restaurantService.findRestaurantByUserId(userId);
+        RestaurantDTOO restaurantDTOO = restaurantService.findRestaurantByUserId(user.getId());
         Restaurant restaurant = restaurantService.findRestaurantById(restaurantDTOO.id());
-        category.setName(request.getName());
-        category.setDescription(request.getDescription());
+        category = categoryDTOMapper.toCategory(request);
         category.setRestaurant(restaurant);
-        return categoryRepository.save(category);
+        return categoryDTOMapper.apply(categoryRepository.save(category));
     }
 
     @Override
@@ -38,14 +49,22 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<Category> getCategoryByRestaurantId(Long restaurantId) {
-        List<Category> categories = categoryRepository.findByRestaurantId(restaurantId);
+    public List<CategoryDTO> getCategoryByRestaurantId(Long restaurantId) {
+        List<CategoryDTO> categories = categoryRepository.findByRestaurantId(restaurantId)
+                .stream()
+                .map(categoryDTOMapper)
+                .collect(Collectors.toList());
+        if (categories.isEmpty()) throw new ListEntityNotFoundException("Not found any food's category");
         return categories;
     }
 
     @Override
-    public List<Category> getCategoryBySearch(String searchKey) {
-        List<Category> categories = categoryRepository.getCategoriesBySearch(searchKey);
+    public List<CategoryDTO> getCategoryBySearch(String searchKey) {
+        List<CategoryDTO> categories = categoryRepository.getCategoriesBySearch(searchKey)
+                .stream()
+                .map(categoryDTOMapper)
+                .collect(Collectors.toList());
+        if (categories.isEmpty()) throw new ListEntityNotFoundException("Not found any food's category");
         return categories;
     }
 
