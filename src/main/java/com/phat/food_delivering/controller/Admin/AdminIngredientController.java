@@ -1,4 +1,4 @@
-package com.phat.food_delivering.controller;
+package com.phat.food_delivering.controller.Admin;
 
 import com.phat.food_delivering.model.IngredientCategory;
 import com.phat.food_delivering.model.IngredientsItem;

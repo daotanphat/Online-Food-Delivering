@@ -1,9 +1,8 @@
-package com.phat.food_delivering.controller;
+package com.phat.food_delivering.controller.Admin;
 
 import com.phat.food_delivering.dto.RestaurantDTOO;
 import com.phat.food_delivering.model.Restaurant;
 import com.phat.food_delivering.model.User;
-import com.phat.food_delivering.request.AddressRequest;
 import com.phat.food_delivering.request.RestaurantRequest;
 import com.phat.food_delivering.response.MessageResponse;
 import com.phat.food_delivering.security.SecurityConstants;

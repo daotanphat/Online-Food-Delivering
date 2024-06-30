@@ -1,5 +1,6 @@
-package com.phat.food_delivering.dto;
+package com.phat.food_delivering.dto.Mapper;
 
+import com.phat.food_delivering.dto.RestaurantDTOO;
 import com.phat.food_delivering.model.Address;
 import com.phat.food_delivering.model.Restaurant;
 import com.phat.food_delivering.model.User;

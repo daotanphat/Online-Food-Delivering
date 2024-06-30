@@ -1,7 +1,7 @@
 package com.phat.food_delivering.controller;
 
 import com.phat.food_delivering.dto.RestaurantDTO;
-import com.phat.food_delivering.dto.RestaurantDTOMapper;
+import com.phat.food_delivering.dto.Mapper.RestaurantDTOMapper;
 import com.phat.food_delivering.dto.RestaurantDTOO;
 import com.phat.food_delivering.model.Restaurant;
 import com.phat.food_delivering.model.User;

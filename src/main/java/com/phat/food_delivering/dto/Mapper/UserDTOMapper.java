@@ -1,5 +1,6 @@
-package com.phat.food_delivering.dto;
+package com.phat.food_delivering.dto.Mapper;
 
+import com.phat.food_delivering.dto.UserDTO;
 import com.phat.food_delivering.model.User;
 import com.phat.food_delivering.request.UserRequest;
 import org.springframework.stereotype.Service;

@@ -4,7 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.phat.food_delivering.dto.UserDTO;
-import com.phat.food_delivering.dto.UserDTOMapper;
+import com.phat.food_delivering.dto.Mapper.UserDTOMapper;
 import com.phat.food_delivering.model.User;
 import com.phat.food_delivering.repository.UserRepository;
 import com.phat.food_delivering.security.SecurityConstants;
