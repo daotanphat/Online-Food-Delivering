@@ -6,5 +6,4 @@ import lombok.Data;
 public class CreateIngredientItemRequest {
     private String name;
     private Long categoryId;
-    private Long restaurantId;
 }
