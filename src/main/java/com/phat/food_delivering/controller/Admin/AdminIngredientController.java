@@ -1,5 +1,7 @@
 package com.phat.food_delivering.controller.Admin;
 
+import com.phat.food_delivering.dto.IngredientCategoryDTO;
+import com.phat.food_delivering.dto.IngredientDTO;
 import com.phat.food_delivering.model.IngredientCategory;
 import com.phat.food_delivering.model.IngredientsItem;
 import com.phat.food_delivering.request.CreateIngredientCategoryRequest;
@@ -23,22 +25,25 @@ public class AdminIngredientController {
     RestaurantService restaurantService;
 
     @PostMapping("/category")
-    public ResponseEntity<IngredientCategory> createIngredientCategory(
-            @RequestBody CreateIngredientCategoryRequest request
+    public ResponseEntity<IngredientCategoryDTO> createIngredientCategory(
+            @RequestBody CreateIngredientCategoryRequest request,
+            @RequestHeader("Authorization") String token
     ) {
-        IngredientCategory ingredientCategory = ingredientService.createIngredientCategory(request.getName(), request.getRestaurantId());
-        return new ResponseEntity<>(ingredientCategory, HttpStatus.CREATED);
+        IngredientCategoryDTO ingredientCategoryDTO = ingredientService.createIngredientCategory(request, token);
+        return new ResponseEntity<>(ingredientCategoryDTO, HttpStatus.CREATED);
     }
 
     @PostMapping("/item")
-    public ResponseEntity<IngredientsItem> createIngredientItem(@RequestBody CreateIngredientItemRequest request) {
-        IngredientsItem ingredientsItem = ingredientService.createIngredientItem(request.getName(), request.getCategoryId(), request.getRestaurantId());
-        return new ResponseEntity<>(ingredientsItem, HttpStatus.CREATED);
+    public ResponseEntity<IngredientDTO> createIngredientItem(
+            @RequestBody CreateIngredientItemRequest request,
+            @RequestHeader("Authorization") String token) {
+        IngredientDTO ingredientDTO = ingredientService.createIngredientItem(request, token);
+        return new ResponseEntity<>(ingredientDTO, HttpStatus.CREATED);
     }
 
     @PutMapping("/status/{id}")
-    public ResponseEntity<IngredientsItem> updateIngredientItemStatus(@PathVariable Long id) {
-        IngredientsItem ingredientsItem = ingredientService.updateIngredientItemStock(id);
-        return new ResponseEntity<>(ingredientsItem, HttpStatus.OK);
+    public ResponseEntity<IngredientDTO> updateIngredientItemStatus(@PathVariable Long id) {
+        IngredientDTO ingredientDTO = ingredientService.updateIngredientItemStock(id);
+        return new ResponseEntity<>(ingredientDTO, HttpStatus.OK);
     }
 }

@@ -1,37 +1,42 @@
 package com.phat.food_delivering.service;
 
+import com.phat.food_delivering.dto.IngredientCategoryDTO;
+import com.phat.food_delivering.dto.IngredientDTO;
+import com.phat.food_delivering.dto.Mapper.IngredientCategoryDTOMapper;
+import com.phat.food_delivering.dto.Mapper.IngredientDTOMapper;
 import com.phat.food_delivering.exception.EntityNotFoundException;
+import com.phat.food_delivering.exception.ListEntityNotFoundException;
 import com.phat.food_delivering.model.IngredientCategory;
 import com.phat.food_delivering.model.IngredientsItem;
 import com.phat.food_delivering.model.Restaurant;
 import com.phat.food_delivering.repository.IngredientCategoryRepository;
 import com.phat.food_delivering.repository.IngredientItemRepository;
+import com.phat.food_delivering.request.CreateIngredientCategoryRequest;
+import com.phat.food_delivering.request.CreateIngredientItemRequest;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class IngredientServiceImpl implements IngredientService {
     IngredientCategoryRepository ingredientCategoryRepository;
     IngredientItemRepository ingredientItemRepository;
     RestaurantService restaurantService;
-
-    @Autowired
-    public IngredientServiceImpl(IngredientCategoryRepository ingredientCategoryRepository, IngredientItemRepository ingredientItemRepository, RestaurantService restaurantService) {
-        this.ingredientItemRepository = ingredientItemRepository;
-        this.ingredientCategoryRepository = ingredientCategoryRepository;
-        this.restaurantService = restaurantService;
-    }
+    IngredientDTOMapper ingredientDTOMapper;
+    IngredientCategoryDTOMapper ingredientCategoryDTOMapper;
 
     @Override
-    public IngredientCategory createIngredientCategory(String name, Long restaurantId) {
-        IngredientCategory ingredientCategory = new IngredientCategory();
-        Restaurant restaurant = restaurantService.findRestaurantById(restaurantId);
-        ingredientCategory.setName(name);
+    public IngredientCategoryDTO createIngredientCategory(CreateIngredientCategoryRequest request, String token) {
+        Restaurant restaurant = restaurantService.findRestaurantByToken(token);
+        IngredientCategory ingredientCategory = ingredientCategoryDTOMapper.toIngredientCategory(request);
         ingredientCategory.setRestaurant(restaurant);
-        return ingredientCategoryRepository.save(ingredientCategory);
+        IngredientCategory ingredientCategorySaved = ingredientCategoryRepository.save(ingredientCategory);
+        return ingredientCategoryDTOMapper.apply(ingredientCategorySaved);
     }
 
     @Override
@@ -41,18 +46,25 @@ public class IngredientServiceImpl implements IngredientService {
     }
 
     @Override
-    public List<IngredientCategory> getIngredientCategoryByRestaurantId(Long restaurantId) {
-        return ingredientCategoryRepository.findByRestaurantId(restaurantId);
+    public List<IngredientCategoryDTO> getIngredientCategoryByRestaurantId(Long restaurantId) {
+        List<IngredientCategory> ingredientCategorys = ingredientCategoryRepository.findByRestaurantId(restaurantId);
+        if (ingredientCategorys.isEmpty()) {
+            throw new ListEntityNotFoundException("Not found any ingredient category");
+        }
+        return ingredientCategorys.stream()
+                .map(ingredientCategoryDTOMapper)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public IngredientsItem createIngredientItem(String name, Long categoryId, Long restaurantId) {
-        IngredientsItem ingredientsItem = new IngredientsItem();
-        Restaurant restaurant = restaurantService.findRestaurantById(restaurantId);
-        ingredientsItem.setName(name);
-        ingredientsItem.setCategory(getIngredientCategoryById(categoryId));
+    public IngredientDTO createIngredientItem(CreateIngredientItemRequest request, String token) {
+        Restaurant restaurant = restaurantService.findRestaurantByToken(token);
+        IngredientCategory ingredientCategory = getIngredientCategoryById(request.getCategoryId());
+        IngredientsItem ingredientsItem = ingredientDTOMapper.toIngredientItem(request);
+        ingredientsItem.setCategory(ingredientCategory);
         ingredientsItem.setRestaurant(restaurant);
-        return ingredientItemRepository.save(ingredientsItem);
+        IngredientsItem ingredientsItemSaved = ingredientItemRepository.save(ingredientsItem);
+        return ingredientDTOMapper.apply(ingredientsItemSaved);
     }
 
     @Override
@@ -62,15 +74,27 @@ public class IngredientServiceImpl implements IngredientService {
     }
 
     @Override
-    public List<IngredientsItem> getIngredientItemByRestaurantId(Long restaurantId) {
-        return ingredientItemRepository.findByRestaurantId(restaurantId);
+    public List<IngredientDTO> getIngredientItemByRestaurantId(Long restaurantId) {
+        List<IngredientsItem> ingredientsItems = ingredientItemRepository.findByRestaurantId(restaurantId);
+        if (ingredientsItems.isEmpty()) {
+            throw new ListEntityNotFoundException("Not found any ingredient item");
+        }
+        return ingredientsItems.stream()
+                .map(ingredientDTOMapper)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public IngredientsItem updateIngredientItemStock(Long id) {
+    public IngredientDTO updateIngredientItemStock(Long id) {
         IngredientsItem ingredientsItem = getIngredientItemById(id);
         ingredientsItem.setInStock(!ingredientsItem.isInStock());
-        return ingredientItemRepository.save(ingredientsItem);
+        IngredientsItem ingredientsItemSaved = ingredientItemRepository.save(ingredientsItem);
+        return ingredientDTOMapper.apply(ingredientsItemSaved);
+    }
+
+    @Override
+    public void save(IngredientsItem ingredientsItem) {
+        ingredientItemRepository.save(ingredientsItem);
     }
 
     static IngredientCategory unwrapIngredientCategory(Optional<IngredientCategory> entity, Long id) {
