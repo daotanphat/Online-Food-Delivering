@@ -3,7 +3,6 @@ package com.phat.food_delivering.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Past;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,6 +30,7 @@ public class Food {
     private Long price;
 
     @ManyToOne
+    @JoinColumn(name = "food_category_id")
     private Category foodCategory;
 
     @Column(length = 1000)
@@ -45,7 +45,7 @@ public class Food {
     private boolean isVegetarian;
     private boolean isSeasonal;
 
-    @ManyToMany(mappedBy = "foods")
+    @ManyToMany(mappedBy = "foods", cascade = CascadeType.PERSIST)
     private List<IngredientsItem> ingredients = new ArrayList<>();
 
     @Past(message = "Date can not be in the past")
