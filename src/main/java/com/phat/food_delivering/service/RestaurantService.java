@@ -27,4 +27,6 @@ public interface RestaurantService {
     public RestaurantDTO addToFavorite(Long restaurantId, User user);
 
     public RestaurantDTOO updateRestaurantStatus(Long restaurantId);
+
+    public Restaurant findRestaurantByToken(String token);
 }

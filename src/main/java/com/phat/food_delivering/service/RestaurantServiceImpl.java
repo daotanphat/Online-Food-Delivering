@@ -136,6 +136,15 @@ public class RestaurantServiceImpl implements RestaurantService {
         return restaurantDTOMapper.apply(savedRestaurant);
     }
 
+    @Override
+    public Restaurant findRestaurantByToken(String token) {
+        token = token.replace(SecurityConstants.BEARER, "");
+        User user = userService.findUserBasedOnToken(token);
+        RestaurantDTOO restaurantDTOO = findRestaurantByUserId(user.getId());
+        Restaurant restaurant = findRestaurantById(restaurantDTOO.id());
+        return restaurant;
+    }
+
     static Restaurant unwrapRestaurant(Optional<Restaurant> entity, Long id) {
         if (entity.isPresent()) {
             return entity.get();
