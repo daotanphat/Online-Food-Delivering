@@ -1,4 +1,4 @@
-package com.phat.food_delivering.dto.Mapper;
+package com.phat.food_delivering.dto;
 
 public record CategoryDTO(
         Long id,

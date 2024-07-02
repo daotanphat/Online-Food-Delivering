@@ -1,10 +1,7 @@
 package com.phat.food_delivering.controller.Admin;
 
-import com.phat.food_delivering.dto.Mapper.CategoryDTO;
-import com.phat.food_delivering.model.Category;
-import com.phat.food_delivering.model.User;
+import com.phat.food_delivering.dto.CategoryDTO;
 import com.phat.food_delivering.request.CreateCategoryRequest;
-import com.phat.food_delivering.security.SecurityConstants;
 import com.phat.food_delivering.service.CategoryService;
 import com.phat.food_delivering.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

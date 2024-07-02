@@ -1,6 +1,6 @@
 package com.phat.food_delivering.service;
 
-import com.phat.food_delivering.dto.Mapper.CategoryDTO;
+import com.phat.food_delivering.dto.CategoryDTO;
 import com.phat.food_delivering.dto.Mapper.CategoryDTOMapper;
 import com.phat.food_delivering.dto.RestaurantDTOO;
 import com.phat.food_delivering.exception.EntityNotFoundException;
@@ -10,14 +10,11 @@ import com.phat.food_delivering.model.Restaurant;
 import com.phat.food_delivering.model.User;
 import com.phat.food_delivering.repository.CategoryRepository;
 import com.phat.food_delivering.request.CreateCategoryRequest;
-import com.phat.food_delivering.response.MessageResponse;
 import com.phat.food_delivering.security.SecurityConstants;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 

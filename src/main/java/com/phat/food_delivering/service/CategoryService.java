@@ -1,6 +1,6 @@
 package com.phat.food_delivering.service;
 
-import com.phat.food_delivering.dto.Mapper.CategoryDTO;
+import com.phat.food_delivering.dto.CategoryDTO;
 import com.phat.food_delivering.model.Category;
 import com.phat.food_delivering.request.CreateCategoryRequest;
 
