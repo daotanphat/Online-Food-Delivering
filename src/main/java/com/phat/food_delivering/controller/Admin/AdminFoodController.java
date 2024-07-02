@@ -1,6 +1,6 @@
-package com.phat.food_delivering.controller;
+package com.phat.food_delivering.controller.Admin;
 
-import com.phat.food_delivering.model.Category;
+import com.phat.food_delivering.dto.FoodDTO;
 import com.phat.food_delivering.model.Food;
 import com.phat.food_delivering.model.Restaurant;
 import com.phat.food_delivering.request.CreateFoodRequest;
@@ -21,16 +21,16 @@ public class AdminFoodController {
     RestaurantService restaurantService;
 
     @PostMapping
-    public ResponseEntity<Food> createFood(@RequestBody CreateFoodRequest request) throws Exception {
-        Restaurant restaurant = restaurantService.findRestaurantById(request.getRestaurantId());
-        Food food = foodService.createFood(request, request.getCategory(), restaurant);
+    public ResponseEntity<FoodDTO> createFood(
+            @RequestBody CreateFoodRequest request,
+            @RequestHeader("Authorization") String token) throws Exception {
+        FoodDTO food = foodService.createFood(request, token);
         return new ResponseEntity<>(food, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Food> updateFood(@RequestBody CreateFoodRequest request, @PathVariable Long id) throws Exception {
-        Restaurant restaurant = restaurantService.findRestaurantById(request.getRestaurantId());
-        Food food = foodService.updateFood(request, request.getCategory(), restaurant, id);
+    public ResponseEntity<FoodDTO> updateFood(@RequestBody CreateFoodRequest request, @PathVariable Long id) throws Exception {
+        FoodDTO food = foodService.updateFood(request, id);
         return new ResponseEntity<>(food, HttpStatus.OK);
     }
 
@@ -43,8 +43,8 @@ public class AdminFoodController {
     }
 
     @PutMapping("/status/{id}")
-    public ResponseEntity<Food> updateFoodStatus(@PathVariable Long id) {
-        Food food = foodService.updateFoodStatus(id);
+    public ResponseEntity<FoodDTO> updateFoodStatus(@PathVariable Long id) {
+        FoodDTO food = foodService.updateFoodStatus(id);
         return new ResponseEntity<>(food, HttpStatus.OK);
     }
 }
