@@ -1,13 +1,15 @@
 package com.phat.food_delivering.service;
 
+import com.phat.food_delivering.dto.FoodDTO;
+import com.phat.food_delivering.dto.Mapper.FoodDTOMapper;
+import com.phat.food_delivering.dto.Mapper.RestaurantDTOMapper;
+import com.phat.food_delivering.dto.RestaurantDTOO;
 import com.phat.food_delivering.exception.EntityNotFoundException;
-import com.phat.food_delivering.model.Category;
-import com.phat.food_delivering.model.Food;
-import com.phat.food_delivering.model.IngredientsItem;
-import com.phat.food_delivering.model.Restaurant;
+import com.phat.food_delivering.model.*;
 import com.phat.food_delivering.repository.CategoryRepository;
 import com.phat.food_delivering.repository.FoodRepository;
 import com.phat.food_delivering.request.CreateFoodRequest;
+import com.phat.food_delivering.security.SecurityConstants;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,53 +27,35 @@ public class FoodServiceImpl implements FoodService {
     FoodRepository foodRepository;
     IngredientService ingredientService;
     CategoryRepository categoryRepository;
+    FoodDTOMapper foodDTOMapper;
+    UserService userService;
+    RestaurantService restaurantService;
+    RestaurantDTOMapper restaurantDTOMapper;
 
     @Override
-    public Food createFood(CreateFoodRequest request, Category category, Restaurant restaurant) {
+    public FoodDTO createFood(CreateFoodRequest request, String token) {
+        token = token.replace(SecurityConstants.BEARER, "");
+        User user = userService.findUserBasedOnToken(token);
+        RestaurantDTOO restaurantDTOO = restaurantService.findRestaurantByUserId(user.getId());
+        Restaurant restaurant = restaurantService.findRestaurantById(restaurantDTOO.id());
         Food food = new Food();
-        IngredientsItem ingredientsItem = new IngredientsItem();
-        categoryRepository.save(category);
-        List<IngredientsItem> ingredientsItems = new ArrayList<>();
-        for (Long itemId : request.getIngredients()) {
-            ingredientsItem = ingredientService.getIngredientItemById(itemId);
-            ingredientsItems.add(ingredientsItem);
-        }
-
-        food.setName(request.getName());
-        food.setDescription(request.getDescription());
-        food.setPrice(request.getPrice());
-        food.setFoodCategory(request.getCategory());
-        food.setImages(request.getImages());
-        food.setAvailable(request.isAvailable());
+        food = foodDTOMapper.toFood(request);
         food.setRestaurant(restaurant);
-        food.setVegetarian(request.isVegetarian());
-        food.setSeasonal(request.isSeasonal());
-        food.setIngredients(ingredientsItems);
-        food.setCreationDate(new Date(new Date().getTime()));
+        food.setCreationDate(new Date());
+        Food foodsaved = foodRepository.save(food);
 
-        return foodRepository.save(food);
+        for (IngredientsItem ingredientsItem : food.getIngredients()) {
+            ingredientsItem.getFoods().add(food);
+            ingredientService.save(ingredientsItem);
+        }
+        return foodDTOMapper.apply(foodsaved);
     }
 
     @Override
-    public Food updateFood(CreateFoodRequest request, Category category, Restaurant restaurant, Long id) {
+    public FoodDTO updateFood(CreateFoodRequest request, Long id) {
         Food food = getFoodById(id);
-        IngredientsItem ingredientsItem = new IngredientsItem();
-        List<IngredientsItem> ingredientsItems = new ArrayList<>();
-        for (Long itemId : request.getIngredients()) {
-            ingredientsItem = ingredientService.getIngredientItemById(itemId);
-            ingredientsItems.add(ingredientsItem);
-        }
-
-        food.setName(request.getName());
-        food.setDescription(request.getDescription());
-        food.setPrice(request.getPrice());
-        food.setFoodCategory(category);
-        food.setImages(request.getImages());
-        food.setAvailable(request.isAvailable());
-        food.setVegetarian(request.isVegetarian());
-        food.setSeasonal(request.isSeasonal());
-        food.setIngredients(ingredientsItems);
-        return foodRepository.save(food);
+        food = foodDTOMapper.toFood(request);
+        return foodDTOMapper.apply(foodRepository.save(food));
     }
 
     @Override
@@ -88,35 +72,41 @@ public class FoodServiceImpl implements FoodService {
     }
 
     @Override
-    public List<Food> getFoodByRestaurantId(Long restaurantId) {
-        return foodRepository.getFoodByRestaurantId(restaurantId);
+    public List<FoodDTO> getFoodByRestaurantId(Long restaurantId) {
+        return foodRepository.getFoodByRestaurantId(restaurantId)
+                .stream()
+                .map(foodDTOMapper)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Food updateFoodStatus(Long id) {
+    public FoodDTO updateFoodStatus(Long id) {
         Food food = getFoodById(id);
         food.setAvailable(!food.isAvailable());
-        return foodRepository.save(food);
+        return foodDTOMapper.apply(foodRepository.save(food));
     }
 
     @Override
-    public List<Food> getFoodIsvegeterianOrSeasonalAndCategoryIdBasedOnRestauarntId(Long restaurantId, boolean isVegeterian, boolean isSeasonal, String category) {
-        List<Food> foods = getFoodByRestaurantId(restaurantId);
+    public List<FoodDTO> getFoodIsvegeterianOrSeasonalAndCategoryIdBasedOnRestauarntId(Long restaurantId, boolean isVegeterian, boolean isSeasonal, String category) {
+        List<FoodDTO> foods = getFoodByRestaurantId(restaurantId);
         if (isVegeterian) {
-            foods = foods.stream().filter(Food::isVegetarian).collect(Collectors.toList());
+            foods = foods.stream().filter(FoodDTO::isVegetarian).collect(Collectors.toList());
         }
         if (isSeasonal) {
-            foods = foods.stream().filter(Food::isSeasonal).collect(Collectors.toList());
+            foods = foods.stream().filter(FoodDTO::isSeasonal).collect(Collectors.toList());
         }
         if (!category.isEmpty() && !category.equals("")) {
-            foods = foods.stream().filter(f -> f.getFoodCategory().getName().equals(category)).collect(Collectors.toList());
+            foods = foods.stream().filter(f -> f.categoryDTO().name().toLowerCase().contains(category.toLowerCase())).collect(Collectors.toList());
         }
         return foods;
     }
 
     @Override
-    public List<Food> getFoodBasedOnKeyWord(String keyWord) {
-        return foodRepository.getFoodByKey(keyWord);
+    public List<FoodDTO> getFoodBasedOnKeyWord(String keyWord) {
+        return foodRepository.getFoodByKey(keyWord)
+                .stream()
+                .map(foodDTOMapper)
+                .collect(Collectors.toList());
     }
 
     static Food unwrappedFood(Optional<Food> entity, Long id) {
