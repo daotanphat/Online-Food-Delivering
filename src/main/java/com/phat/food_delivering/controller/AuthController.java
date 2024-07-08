@@ -1,6 +1,7 @@
 package com.phat.food_delivering.controller;
 
 import com.phat.food_delivering.dto.Mapper.UserDTOMapper;
+import com.phat.food_delivering.dto.UserDTO;
 import com.phat.food_delivering.model.Cart;
 import com.phat.food_delivering.model.User;
 import com.phat.food_delivering.request.UserRequest;
@@ -28,7 +29,7 @@ public class AuthController {
     UserDTOMapper userDTOMapper;
 
     @PostMapping("/signup")
-    public ResponseEntity<User> signUp(@Valid @RequestBody UserRequest request) throws Exception {
+    public ResponseEntity<UserDTO> signUp(@Valid @RequestBody UserRequest request) throws Exception {
         User isEmailExist = userService.findUserByEmail(request.getEmail());
         if (isEmailExist != null) {
             throw new Exception("Email is already used in with another account");
@@ -41,6 +42,6 @@ public class AuthController {
         cart.setCustomer(savedUser);
         cartService.saveCart(cart);
 
-        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+        return new ResponseEntity<>(userDTOMapper.apply(savedUser), HttpStatus.CREATED);
     }
 }
