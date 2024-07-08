@@ -51,6 +51,13 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                 .withExpiresAt(new Date(System.currentTimeMillis() + SecurityConstants.TOKEN_EXPIRATION))
                 .sign(Algorithm.HMAC512(SecurityConstants.SECRET_KEY));
         response.addHeader(SecurityConstants.HEADER, SecurityConstants.BEARER + token);
+
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("jwt", token);
+        responseBody.put("role", roles);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        new ObjectMapper().writeValue(response.getWriter(), responseBody);
     }
 
     private String populateAuthorities(Collection<? extends GrantedAuthority> authorities) {
