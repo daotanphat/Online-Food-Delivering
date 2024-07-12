@@ -34,7 +34,9 @@ public class UserServiceIplm implements UserService {
 
     @Override
     public User saveUser(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        if(findUserByEmail(user.getEmail()) == null){
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
         return userRepository.save(user);
     }
 
@@ -54,5 +56,10 @@ public class UserServiceIplm implements UserService {
                 .stream()
                 .map(userDTOMapper)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void updatePassword(String email, String password) {
+        userRepository.updatePassword(password, email);
     }
 }
