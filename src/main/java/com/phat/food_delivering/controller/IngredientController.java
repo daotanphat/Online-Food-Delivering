@@ -52,4 +52,10 @@ public class IngredientController {
         List<IngredientDTO> ingredientsItem = ingredientService.getIngredientItemByRestaurantId(id);
         return new ResponseEntity<>(ingredientsItem, HttpStatus.OK);
     }
+
+    @GetMapping("/item/food/{id}")
+    public ResponseEntity<List<IngredientDTO>> getIngredientItemByFoodId(@PathVariable Long id){
+        List<IngredientDTO> ingredientDTOS = ingredientService.getIngredientItemByFoodId(id);
+        return new ResponseEntity<>(ingredientDTOS, HttpStatus.OK);
+    }
 }
