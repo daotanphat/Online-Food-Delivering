@@ -17,6 +17,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -95,6 +96,17 @@ public class IngredientServiceImpl implements IngredientService {
     @Override
     public void save(IngredientsItem ingredientsItem) {
         ingredientItemRepository.save(ingredientsItem);
+    }
+
+    @Override
+    public List<IngredientDTO> getIngredientItemByFoodId(Long foodId) {
+        List<IngredientsItem> ingredientsItems = ingredientItemRepository.findByFoodId(foodId);
+        List<IngredientDTO> ingredientDTOS = new ArrayList<>();
+        for(IngredientsItem ingredientsItem: ingredientsItems){
+            IngredientDTO ingredientDTO = ingredientDTOMapper.apply(ingredientsItem);
+            ingredientDTOS.add(ingredientDTO);
+        }
+        return ingredientDTOS;
     }
 
     static IngredientCategory unwrapIngredientCategory(Optional<IngredientCategory> entity, Long id) {

@@ -25,4 +25,6 @@ public interface IngredientService {
     public IngredientDTO updateIngredientItemStock(Long id);
 
     public void save(IngredientsItem ingredientsItem);
+
+    public List<IngredientDTO> getIngredientItemByFoodId(Long foodId);
 }
