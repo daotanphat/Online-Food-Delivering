@@ -1,5 +1,9 @@
 package com.phat.food_delivering.service;
 
+import com.phat.food_delivering.dto.CartDTO;
+import com.phat.food_delivering.dto.CartItemDTO;
+import com.phat.food_delivering.dto.Mapper.CartDTOMapper;
+import com.phat.food_delivering.dto.Mapper.CartItemDTOMapper;
 import com.phat.food_delivering.exception.EntityNotFoundException;
 import com.phat.food_delivering.model.Cart;
 import com.phat.food_delivering.model.CartItem;
@@ -28,15 +32,22 @@ public class CartServiceImpl implements CartService {
     @Autowired
     private CartItemRepository cartItemRepository;
 
+    @Autowired
+    CartDTOMapper cartDTOMapper;
+
+    @Autowired
+    CartItemDTOMapper cartItemDTOMapper;
+
     @Override
     public void saveCart(Cart cart) {
         cartRepository.save(cart);
     }
 
     @Override
-    public CartItem addCartItemIntoCart(CartItemRequest request, String token) {
+    public CartItemDTO addCartItemIntoCart(CartItemRequest request, String token) {
         Food food = foodService.getFoodById(request.getFoodId());
-        Cart cart = findCartByUserId(token);
+        CartDTO cartDTO = findCartByUserId(token);
+        Cart cart = findCartById(cartDTO.id());
 
         CartItem cartItem = new CartItem();
         cartItem.setFood(food);
@@ -69,7 +80,7 @@ public class CartServiceImpl implements CartService {
         Cart savedCart = cartRepository.save(cart);
         cart.setTotal(calculateTotal(savedCart));
         cartRepository.save(cart);
-        return savedCartItem;
+        return cartItemDTOMapper.apply(savedCartItem);
     }
 
     @Override
@@ -88,12 +99,13 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public Cart removeItemFromCart(Long cartItemId, String token) {
+    public CartDTO removeItemFromCart(Long cartItemId, String token) {
         CartItem cartItem = findCartItemById(cartItemId);
-        Cart cart = findCartByUserId(token);
+        CartDTO cartDTO = findCartByUserId(token);
+        Cart cart = findCartById(cartDTO.id());
         if (cart.getItems().contains(cartItem)) cart.getItems().remove(cartItem);
         cart.setTotal(calculateTotal(cart));
-        return cartRepository.save(cart);
+        return cartDTOMapper.apply(cartRepository.save(cart));
     }
 
     @Override
@@ -114,11 +126,11 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public Cart findCartByUserId(String token) {
+    public CartDTO findCartByUserId(String token) {
         token = token.replace(SecurityConstants.BEARER, "");
         User user = userService.findUserBasedOnToken(token);
         Cart cart = cartRepository.findByCustomerId(user.getId());
-        return cartRepository.findByCustomerId(user.getId());
+        return cartDTOMapper.apply(cartRepository.findByCustomerId(user.getId()));
     }
 
     @Override
@@ -128,11 +140,12 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public Cart clearCartItem(String token) {
-        Cart cart = findCartByUserId(token);
+    public CartDTO clearCartItem(String token) {
+        CartDTO cartDTO = findCartByUserId(token);
+        Cart cart = findCartById(cartDTO.id());
         cart.getItems().clear();
         cart.setTotal(calculateTotal(cart));
-        return cartRepository.save(cart);
+        return cartDTOMapper.apply(cartRepository.save(cart));
     }
 
     static CartItem unwrapCartItem(Optional<CartItem> entity, Long id) {
