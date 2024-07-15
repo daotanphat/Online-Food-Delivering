@@ -11,10 +11,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -43,5 +40,14 @@ public class AuthController {
         cartService.saveCart(cart);
 
         return new ResponseEntity<>(userDTOMapper.apply(savedUser), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/update-password/{password}")
+    public ResponseEntity<HttpStatus> updatePassword(
+            @RequestHeader("Authorization") String token,
+            @PathVariable String password){
+        User user = userService.findUserBasedOnToken(token);
+        userService.updatePassword(user.getEmail(), password);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

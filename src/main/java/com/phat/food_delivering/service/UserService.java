@@ -13,4 +13,6 @@ public interface UserService {
     User findUserBasedOnToken(String token);
 
     List<UserDTO> findAllUsers();
+
+    void updatePassword(String email, String password);
 }
