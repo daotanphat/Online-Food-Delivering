@@ -1,5 +1,6 @@
 package com.phat.food_delivering.service;
 
+import com.phat.food_delivering.dto.CartDTO;
 import com.phat.food_delivering.exception.EntityNotFoundException;
 import com.phat.food_delivering.model.*;
 import com.phat.food_delivering.repository.OrderItemRepository;
@@ -47,7 +48,8 @@ public class OrderServiceImpl implements OrderService {
             user.getAddresses().add(shipAddress);
             userRepository.save(user);
         }
-        Cart cart = cartService.findCartByUserId(token);
+        CartDTO cartDTO = cartService.findCartByUserId(token);
+        Cart cart = cartService.findCartById(cartDTO.id());
 
         Order order = new Order();
         order.setCustomer(user);
