@@ -1,6 +1,8 @@
 package com.phat.food_delivering.service;
 
 import com.phat.food_delivering.dto.CartDTO;
+import com.phat.food_delivering.dto.Mapper.OrderDTOMapper;
+import com.phat.food_delivering.dto.OrderDTO;
 import com.phat.food_delivering.exception.EntityNotFoundException;
 import com.phat.food_delivering.model.*;
 import com.phat.food_delivering.repository.OrderItemRepository;
@@ -30,10 +32,11 @@ public class OrderServiceImpl implements OrderService {
     RestaurantRepository restaurantRepository;
     AddressService addressService;
     CartService cartService;
+    OrderDTOMapper orderDTOMapper;
 
 
     @Override
-    public Order createOrder(OrderRequest request, String token) {
+    public OrderDTO createOrder(OrderRequest request, String token) {
         token = token.replace(SecurityConstants.BEARER, "");
         User user = userService.findUserBasedOnToken(token);
         Restaurant restaurant = restaurantService.findRestaurantById(request.getRestaurantId());
@@ -77,11 +80,11 @@ public class OrderServiceImpl implements OrderService {
         restaurant.getOrders().add(savedOrder);
         restaurantRepository.save(restaurant);
 
-        return orderRepository.save(order);
+        return orderDTOMapper.apply(orderRepository.save(order));
     }
 
     @Override
-    public Order updateOrderStatus(Long id, String status) {
+    public OrderDTO updateOrderStatus(Long id, String status) {
         Order order = getOrderById(id);
         if (status.equals("OUT_FOR_DELIVERY")
                 || status.equals("DELIVERED")
@@ -91,7 +94,7 @@ public class OrderServiceImpl implements OrderService {
             order.setOrderStatus(status);
             order = orderRepository.save(order);
         }
-        return order;
+        return orderDTOMapper.apply(order);
     }
 
     @Override
@@ -100,20 +103,25 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<Order> getUserOrder(String token) {
+    public List<OrderDTO> getUserOrder(String token) {
         token = token.replace(SecurityConstants.BEARER, "");
         User user = userService.findUserBasedOnToken(token);
         List<Order> orders = orderRepository.findOrderByCustomerId(user.getId());
+        List<OrderDTO> orderDTOS = new ArrayList<>();
+        for(Order order: orders){
+            OrderDTO orderDTO = orderDTOMapper.apply(order);
+            orderDTOS.add(orderDTO);
+        }
 
         MessageResponse messageResponse = new MessageResponse();
         if (orders.isEmpty()) {
             messageResponse.setMessage("No order can be found.");
         }
-        return orders;
+        return orderDTOS;
     }
 
     @Override
-    public List<Order> getRestaurantOrder(Long restaurantId, String status) {
+    public List<OrderDTO> getRestaurantOrder(Long restaurantId, String status) {
         List<Order> orders = orderRepository.findOrderByRestaurantId(restaurantId);
         MessageResponse messageResponse = new MessageResponse();
         if (orders.isEmpty()) {
@@ -123,7 +131,12 @@ public class OrderServiceImpl implements OrderService {
                 orders = orders.stream().filter(o -> o.getOrderStatus().equals(status)).collect(Collectors.toList());
             }
         }
-        return orders;
+        List<OrderDTO> orderDTOS = new ArrayList<>();
+        for(Order order: orders){
+            OrderDTO orderDTO = orderDTOMapper.apply(order);
+            orderDTOS.add(orderDTO);
+        }
+        return orderDTOS;
     }
 
     @Override

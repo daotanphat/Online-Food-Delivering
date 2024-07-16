@@ -1,5 +1,6 @@
 package com.phat.food_delivering.controller;
 
+import com.phat.food_delivering.dto.OrderDTO;
 import com.phat.food_delivering.model.Order;
 import com.phat.food_delivering.request.OrderRequest;
 import com.phat.food_delivering.service.OrderService;
@@ -17,12 +18,12 @@ public class OrderController {
     OrderService orderService;
 
     @PostMapping
-    public ResponseEntity<Order> createOrder(
+    public ResponseEntity<OrderDTO> createOrder(
             @RequestBody OrderRequest request,
             @RequestHeader("Authorization") String token
     ) {
-        Order order = orderService.createOrder(request, token);
-        return new ResponseEntity<>(order, HttpStatus.CREATED);
+        OrderDTO orderDTO = orderService.createOrder(request, token);
+        return new ResponseEntity<>(orderDTO, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
@@ -32,8 +33,8 @@ public class OrderController {
     }
 
     @GetMapping("/user")
-    public ResponseEntity<List<Order>> getUserOrder(@RequestHeader("Authorization") String token) {
-        List<Order> orders = orderService.getUserOrder(token);
-        return new ResponseEntity<>(orders, HttpStatus.OK);
+    public ResponseEntity<List<OrderDTO>> getUserOrder(@RequestHeader("Authorization") String token) {
+        List<OrderDTO> orderDTOs = orderService.getUserOrder(token);
+        return new ResponseEntity<>(orderDTOs, HttpStatus.OK);
     }
 }
