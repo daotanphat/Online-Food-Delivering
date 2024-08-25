@@ -127,7 +127,7 @@ public class OrderServiceImpl implements OrderService {
         if (orders.isEmpty()) {
             messageResponse.setMessage("No order can be found.");
         } else {
-            if (!status.isEmpty() || status.trim().equals("")) {
+            if ((!status.isEmpty() || !status.trim().equals("")) && !status.equals("ALL")) {
                 orders = orders.stream().filter(o -> o.getOrderStatus().equals(status)).collect(Collectors.toList());
             }
         }
