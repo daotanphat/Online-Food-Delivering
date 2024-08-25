@@ -25,4 +25,9 @@ public class UserServiceIplm implements UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
+
+    @Override
+    public Boolean existByEmail(String email) {
+        return findUserByEmail(email) != null;
+    }
 }

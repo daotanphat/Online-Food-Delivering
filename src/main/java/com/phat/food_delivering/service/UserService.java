@@ -6,4 +6,6 @@ public interface UserService {
     User findUserByEmail(String email);
 
     User saveUser(User user);
+
+    Boolean existByEmail(String email);
 }
