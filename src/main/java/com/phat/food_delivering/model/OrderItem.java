@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,9 +23,10 @@ public class OrderItem {
     private long id;
 
     @ManyToOne
+    @JoinColumn(name = "food_id", nullable = false)
     private Food food;
 
-    @Size(min = 0)
+    //@Size(min = 0)
     @NonNull
     private int quantity;
     private Long totalPrice;

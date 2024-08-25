@@ -1,6 +1,7 @@
 package com.phat.food_delivering.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.phat.food_delivering.dto.RestaurantDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -16,6 +17,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "users")
 public class User {
 
     @Id
@@ -35,6 +37,7 @@ public class User {
     @NotBlank(message = "Password can not be blank")
     @NonNull
     @Column(nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @Column(nullable = false)

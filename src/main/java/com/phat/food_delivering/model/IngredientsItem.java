@@ -8,6 +8,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -22,12 +25,22 @@ public class IngredientsItem {
     private String name;
 
     @ManyToOne
+    @JoinColumn(name = "category_id")
     private IngredientCategory category;
 
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "restaurant_id", referencedColumnName = "id")
     private Restaurant restaurant;
+
+
+    @ManyToMany
+    @JoinTable(
+            name = "ingredient_food",
+            joinColumns = @JoinColumn(name = "ingredientId"),
+            inverseJoinColumns = @JoinColumn(name = "foodId")
+    )
+    private List<Food> foods = new ArrayList<>();
 
     private boolean inStock = true;
 }

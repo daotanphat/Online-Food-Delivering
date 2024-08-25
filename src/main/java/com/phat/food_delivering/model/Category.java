@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
+import java.util.List;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -24,5 +26,9 @@ public class Category {
 
     @JsonIgnore
     @ManyToOne
+    @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
+
+    @OneToMany(mappedBy = "foodCategory", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Food> foods;
 }

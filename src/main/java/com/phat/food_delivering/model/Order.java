@@ -39,7 +39,7 @@ public class Order {
     @ManyToOne
     private Address deliveryAddress;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
     private int totalItem;
     private Long totalPrice;
