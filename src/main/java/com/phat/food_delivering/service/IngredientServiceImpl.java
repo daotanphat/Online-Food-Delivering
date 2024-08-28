@@ -16,6 +16,7 @@ import com.phat.food_delivering.request.CreateIngredientItemRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -102,11 +103,31 @@ public class IngredientServiceImpl implements IngredientService {
     public List<IngredientDTO> getIngredientItemByFoodId(Long foodId) {
         List<IngredientsItem> ingredientsItems = ingredientItemRepository.findByFoodId(foodId);
         List<IngredientDTO> ingredientDTOS = new ArrayList<>();
-        for(IngredientsItem ingredientsItem: ingredientsItems){
+        for (IngredientsItem ingredientsItem : ingredientsItems) {
             IngredientDTO ingredientDTO = ingredientDTOMapper.apply(ingredientsItem);
             ingredientDTOS.add(ingredientDTO);
         }
         return ingredientDTOS;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteIngredientById(Long ingredientId) {
+        try {
+            ingredientItemRepository.deleteById(ingredientId);
+        } catch (Exception e) {
+            throw new RuntimeException("Error occurred while deleting ingredient with ID: " + ingredientId, e);
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteIngredientCategoryById(Long ingredientCategoryId) {
+        try {
+            ingredientCategoryRepository.deleteById(ingredientCategoryId);
+        } catch (Exception e) {
+            throw new RuntimeException("Error occurred while deleting ingredient category with ID: " + ingredientCategoryId, e);
+        }
     }
 
     static IngredientCategory unwrapIngredientCategory(Optional<IngredientCategory> entity, Long id) {

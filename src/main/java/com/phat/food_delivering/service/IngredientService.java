@@ -27,4 +27,8 @@ public interface IngredientService {
     public void save(IngredientsItem ingredientsItem);
 
     public List<IngredientDTO> getIngredientItemByFoodId(Long foodId);
+
+    public void deleteIngredientById(Long ingredientId);
+
+    public void deleteIngredientCategoryById(Long ingredientCategoryId);
 }
