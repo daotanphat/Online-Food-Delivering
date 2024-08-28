@@ -6,10 +6,14 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Logger;
 
 @Component
@@ -18,9 +22,12 @@ public class JwtUtils {
     public String generateJwtToken(Authentication authentication) {
 
         UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
+        Collection<? extends GrantedAuthority> authorities = userPrincipal.getAuthorities();
+        String roles = populateAuthorities(authorities);
 
         return Jwts.builder()
-                .setSubject((userPrincipal.getUsername()))
+                .claim("email", (userPrincipal.getEmail()))
+                .claim("authorities", roles)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + SecurityConstants.TOKEN_EXPIRATION))
                 .signWith(key(), SignatureAlgorithm.HS256)
@@ -32,8 +39,12 @@ public class JwtUtils {
     }
 
     public String getUserNameFromJwtToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(key()).build()
-                .parseClaimsJws(token).getBody().getSubject();
+        return Jwts.parserBuilder()
+                .setSigningKey(key())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("email", String.class);
     }
 
     public boolean validateJwtToken(String authToken) {
@@ -51,5 +62,14 @@ public class JwtUtils {
         }
 
         return false;
+    }
+
+    private String populateAuthorities(Collection<? extends GrantedAuthority> authorities) {
+        Set<String> auths = new HashSet<>();
+
+        for (GrantedAuthority authority : authorities) {
+            auths.add((authority.getAuthority()));
+        }
+        return String.join(",", auths);
     }
 }
