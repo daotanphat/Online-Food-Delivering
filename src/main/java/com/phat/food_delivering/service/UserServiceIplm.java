@@ -8,6 +8,7 @@ import com.phat.food_delivering.dto.Mapper.UserDTOMapper;
 import com.phat.food_delivering.model.User;
 import com.phat.food_delivering.repository.UserRepository;
 import com.phat.food_delivering.security.SecurityConstants;
+import io.jsonwebtoken.io.Decoders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -46,7 +47,8 @@ public class UserServiceIplm implements UserService {
     }
 
     public User findUserBasedOnToken(String token) {
-        DecodedJWT subject = JWT.require(Algorithm.HMAC512(SecurityConstants.SECRET_KEY))
+        Algorithm algorithm = Algorithm.HMAC256(Decoders.BASE64.decode(SecurityConstants.SECRET_KEY));
+        DecodedJWT subject = JWT.require(algorithm)
                 .build()
                 .verify(token);
         String email = subject.getClaim("email").asString();
