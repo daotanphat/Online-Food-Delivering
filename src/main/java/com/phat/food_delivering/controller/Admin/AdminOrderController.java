@@ -16,7 +16,7 @@ public class AdminOrderController {
     @Autowired
     OrderService orderService;
 
-    @PutMapping("/{id}/status")
+    @GetMapping("/{id}")
     public ResponseEntity<OrderDTO> updateOrderStatus(
             @PathVariable Long id,
             @RequestParam String status

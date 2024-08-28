@@ -6,6 +6,7 @@ import com.phat.food_delivering.model.IngredientCategory;
 import com.phat.food_delivering.model.IngredientsItem;
 import com.phat.food_delivering.request.CreateIngredientCategoryRequest;
 import com.phat.food_delivering.request.CreateIngredientItemRequest;
+import com.phat.food_delivering.response.MessageResponse;
 import com.phat.food_delivering.service.IngredientService;
 import com.phat.food_delivering.service.RestaurantService;
 import com.phat.food_delivering.service.UserService;
@@ -41,9 +42,25 @@ public class AdminIngredientController {
         return new ResponseEntity<>(ingredientDTO, HttpStatus.CREATED);
     }
 
-    @PutMapping("/status/{id}")
+    @GetMapping("/status/{id}")
     public ResponseEntity<IngredientDTO> updateIngredientItemStatus(@PathVariable Long id) {
         IngredientDTO ingredientDTO = ingredientService.updateIngredientItemStock(id);
         return new ResponseEntity<>(ingredientDTO, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}/delete")
+    public ResponseEntity<MessageResponse> deleteIngredient(@PathVariable Long id) {
+        ingredientService.deleteIngredientById(id);
+        MessageResponse messageResponse = new MessageResponse();
+        messageResponse.setMessage("Delete ingredient successfully");
+        return new ResponseEntity<>(messageResponse, HttpStatus.OK);
+    }
+
+    @GetMapping("/category/{id}/delete")
+    public ResponseEntity<MessageResponse> deleteIngredientCategory(@PathVariable Long id) {
+        ingredientService.deleteIngredientCategoryById(id);
+        MessageResponse messageResponse = new MessageResponse();
+        messageResponse.setMessage("Delete ingredient category successfully");
+        return new ResponseEntity<>(messageResponse, HttpStatus.OK);
     }
 }
