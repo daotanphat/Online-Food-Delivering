@@ -14,4 +14,8 @@ public interface CategoryService {
     public List<CategoryDTO> getCategoryByRestaurantId(Long restaurantId);
 
     public List<CategoryDTO> getCategoryBySearch(String searchKey);
+
+    public void deleteCategoryById(Long categoryId);
+
+    public CategoryDTO updateCategory(CreateCategoryRequest request, Long id);
 }
