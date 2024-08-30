@@ -1,8 +1,6 @@
 package com.phat.food_delivering.dto;
 
-import com.phat.food_delivering.model.Address;
-import com.phat.food_delivering.model.ContactInformation;
-import com.phat.food_delivering.model.User;
+import com.phat.food_delivering.model.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,6 +16,7 @@ public record RestaurantDTOO(
         String openingHours,
         List<String> images,
         LocalDateTime registrationDate,
-        boolean open
+        boolean open,
+        List<CategoryDTO> categories
 ) {
 }

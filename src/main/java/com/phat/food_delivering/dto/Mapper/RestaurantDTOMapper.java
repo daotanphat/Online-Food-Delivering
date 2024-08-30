@@ -1,19 +1,29 @@
 package com.phat.food_delivering.dto.Mapper;
 
+import com.phat.food_delivering.dto.CategoryDTO;
+import com.phat.food_delivering.dto.IngredientDTO;
 import com.phat.food_delivering.dto.RestaurantDTOO;
-import com.phat.food_delivering.model.Address;
-import com.phat.food_delivering.model.Restaurant;
-import com.phat.food_delivering.model.User;
+import com.phat.food_delivering.model.*;
 import com.phat.food_delivering.request.RestaurantRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
 @Service
 public class RestaurantDTOMapper implements Function<Restaurant, RestaurantDTOO> {
+    @Autowired
+    CategoryDTOMapper categoryDTOMapper;
+
     @Override
     public RestaurantDTOO apply(Restaurant restaurant) {
+        List<CategoryDTO> categoryDTOS = new ArrayList<>();
+        for (Category category : restaurant.getCategories()) {
+            categoryDTOS.add(categoryDTOMapper.apply(category));
+        }
         return new RestaurantDTOO(
                 restaurant.getId(),
                 restaurant.getOwner(),
@@ -25,7 +35,8 @@ public class RestaurantDTOMapper implements Function<Restaurant, RestaurantDTOO>
                 restaurant.getOpeningHours(),
                 restaurant.getImages(),
                 restaurant.getRegistrationDate(),
-                restaurant.isOpen()
+                restaurant.isOpen(),
+                categoryDTOS
         );
     }
 
