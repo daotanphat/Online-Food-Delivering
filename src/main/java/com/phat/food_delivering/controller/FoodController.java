@@ -38,13 +38,11 @@ public class FoodController {
     }
 
     @GetMapping("/restaurant-filter/{id}")
-    public ResponseEntity<List<FoodDTO>> getFoodIsvegeterianOrSeasonalAndCategoryIdBasedOnRestauarntId(
+    public ResponseEntity<List<FoodDTO>> getFoodByRestaurantIdAndCategoryId(
             @PathVariable Long id,
-            @RequestParam boolean isVegetarian,
-            @RequestParam boolean isSeasonal,
-            @RequestParam String categoryName
+            @RequestParam Long categoryId
     ) {
-        List<FoodDTO> foods = foodService.getFoodIsvegeterianOrSeasonalAndCategoryIdBasedOnRestauarntId(id, isVegetarian, isSeasonal, categoryName);
+        List<FoodDTO> foods = foodService.getFoodByRestauarntIdAndCategoryId(id, categoryId);
         if (foods.isEmpty()) {
             throw new ListEntityNotFoundException("Not found any food");
         }

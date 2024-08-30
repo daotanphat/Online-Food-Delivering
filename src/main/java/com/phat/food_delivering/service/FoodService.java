@@ -21,11 +21,9 @@ public interface FoodService {
 
     public FoodDTO updateFoodStatus(Long id);
 
-    public List<FoodDTO> getFoodIsvegeterianOrSeasonalAndCategoryIdBasedOnRestauarntId(
+    public List<FoodDTO> getFoodByRestauarntIdAndCategoryId(
             Long restaurantId,
-            boolean isVegeterian,
-            boolean isSeasonal,
-            String category);
+            Long categoryId);
 
     public List<FoodDTO> getFoodBasedOnKeyWord(String keyWord);
 }

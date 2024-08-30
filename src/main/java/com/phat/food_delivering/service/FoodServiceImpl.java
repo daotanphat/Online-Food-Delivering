@@ -87,15 +87,10 @@ public class FoodServiceImpl implements FoodService {
     }
 
     @Override
-    public List<FoodDTO> getFoodIsvegeterianOrSeasonalAndCategoryIdBasedOnRestauarntId(Long restaurantId, boolean isVegeterian, boolean isSeasonal, String category) {
+    public List<FoodDTO> getFoodByRestauarntIdAndCategoryId(Long restaurantId, Long categoryId) {
         List<FoodDTO> foods = getFoodByRestaurantId(restaurantId);
-        if (isVegeterian) {
-            foods = foods.stream().filter((food) -> food.isVegetarian() && !food.isSeasonal()).collect(Collectors.toList());
-        } else if (isSeasonal) {
-            foods = foods.stream().filter((food) -> !food.isVegetarian() && food.isSeasonal()).collect(Collectors.toList());
-        }
-        if (!category.isEmpty() && !category.equals("")) {
-            foods = foods.stream().filter(f -> f.categoryDTO().name().toLowerCase().contains(category.toLowerCase())).collect(Collectors.toList());
+        if (categoryId != -1) {
+            foods = foods.stream().filter(f -> f.categoryDTO().id().equals(categoryId)).collect(Collectors.toList());
         }
         return foods;
     }
