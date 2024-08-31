@@ -1,21 +1,36 @@
 package com.phat.food_delivering.dto.Mapper;
 
+import com.phat.food_delivering.dto.AddressDTO;
 import com.phat.food_delivering.dto.UserDTO;
+import com.phat.food_delivering.model.Address;
 import com.phat.food_delivering.model.User;
 import com.phat.food_delivering.request.UserRequest;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
 @Service
+@AllArgsConstructor
 public class UserDTOMapper implements Function<User, UserDTO> {
+    private AddressDTOMapper addressDTOMapper;
+
     @Override
     public UserDTO apply(User user) {
+        AddressDTO addressDTO = addressDTOMapper.apply(user.getAddress());
+        List<AddressDTO> addressDTOS = new ArrayList<>();
+        for (Address address : user.getAddresses()) {
+            addressDTOS.add(addressDTOMapper.apply(address));
+        }
         return new UserDTO(
                 user.getFullName(),
                 user.getEmail(),
                 user.getRole(),
-                user.getAddresses()
+                addressDTO,
+                addressDTOS,
+                user.getFavorites()
         );
     }
 

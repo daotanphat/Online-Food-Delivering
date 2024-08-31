@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.phat.food_delivering.dto.UserDTO;
 import com.phat.food_delivering.dto.Mapper.UserDTOMapper;
+import com.phat.food_delivering.model.Address;
 import com.phat.food_delivering.model.User;
 import com.phat.food_delivering.repository.UserRepository;
 import com.phat.food_delivering.security.SecurityConstants;
@@ -27,6 +28,9 @@ public class UserServiceIplm implements UserService {
 
     @Autowired
     private UserDTOMapper userDTOMapper;
+
+    @Autowired
+    AddressService addressService;
 
     @Override
     public User findUserByEmail(String email) {
@@ -67,5 +71,15 @@ public class UserServiceIplm implements UserService {
     @Override
     public void updatePassword(String email, String password) {
         userRepository.updatePassword(password, email);
+    }
+
+    @Override
+    public UserDTO addFavoriteAddress(Long addressId, String token) {
+        Address address = addressService.getAddressById(addressId);
+        User user = findUserBasedOnToken(token);
+        user.setAddress(new Address());
+        user.setAddress(address);
+        userRepository.save(user);
+        return userDTOMapper.apply(user);
     }
 }

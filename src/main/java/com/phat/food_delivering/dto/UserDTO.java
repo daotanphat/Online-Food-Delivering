@@ -9,6 +9,8 @@ public record UserDTO(
         String fullName,
         String email,
         USER_ROLE role,
-        List<Address> addresses
+        AddressDTO address,
+        List<AddressDTO> addresses,
+        List<RestaurantDTO> favorites
 ) {
 }

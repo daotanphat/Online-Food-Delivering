@@ -17,4 +17,6 @@ public interface UserService {
     List<UserDTO> findAllUsers();
 
     void updatePassword(String email, String password);
+
+    UserDTO addFavoriteAddress(Long addressId, String token);
 }
