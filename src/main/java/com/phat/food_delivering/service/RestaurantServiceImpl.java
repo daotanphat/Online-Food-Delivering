@@ -48,10 +48,10 @@ public class RestaurantServiceImpl implements RestaurantService {
 
         List<Address> addresses = addressService.getAddresses();
         Address address = restaurantRequest.getAddress();
-        if (!addressService.checkDuplicateAddress(address, addresses)) {
+        if (!addressService.checkDuplicateAddress(addressDTOMapper.apply(address), addresses)) {
             address = addressService.save(restaurantRequest.getAddress());
         } else {
-            address = addressService.findAddress(address);
+            address = addressService.getAddressById(address.getId());
         }
         Restaurant restaurant = restaurantDTOMapper.toRestaurant(restaurantRequest, user, address);
 
@@ -106,6 +106,9 @@ public class RestaurantServiceImpl implements RestaurantService {
     @Override
     public RestaurantDTOO findRestaurantByUserId(Long userId) {
         Restaurant restaurant = restaurantRepository.findByOwnerId(userId);
+        if (restaurant == null) {
+            return RestaurantDTOO.noArgConstructor();
+        }
         return restaurantDTOMapper.apply(restaurant);
     }
 
