@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 public class IngredientCategory {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @NotBlank(message = "Name of food category can not be blank")
