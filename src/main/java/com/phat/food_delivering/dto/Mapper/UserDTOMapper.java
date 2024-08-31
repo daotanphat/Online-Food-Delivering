@@ -19,7 +19,10 @@ public class UserDTOMapper implements Function<User, UserDTO> {
 
     @Override
     public UserDTO apply(User user) {
-        AddressDTO addressDTO = addressDTOMapper.apply(user.getAddress());
+        AddressDTO addressDTO = new AddressDTO();
+        if (user.getAddress() != null) {
+            addressDTO = addressDTOMapper.apply(user.getAddress());
+        }
         List<AddressDTO> addressDTOS = new ArrayList<>();
         for (Address address : user.getAddresses()) {
             addressDTOS.add(addressDTOMapper.apply(address));
