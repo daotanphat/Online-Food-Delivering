@@ -20,11 +20,12 @@ public class OrderDTOMapper implements Function<Order, OrderDTO> {
     UserDTOMapper userDTOMapper;
     RestaurantDTOMapper restaurantDTOMapper;
     OrderItemDTOMapper orderItemDTOMapper;
+    AddressDTOMapper addressDTOMapper;
 
     @Override
     public OrderDTO apply(Order order) {
         List<OrderItemDTO> orderItemDTOS = new ArrayList<>();
-        for(OrderItem orderItem: order.getItems()){
+        for (OrderItem orderItem : order.getItems()) {
             OrderItemDTO orderItemDTO = orderItemDTOMapper.apply(orderItem);
             orderItemDTOS.add(orderItemDTO);
         }
@@ -36,7 +37,7 @@ public class OrderDTOMapper implements Function<Order, OrderDTO> {
                 order.getTotalAmount(),
                 order.getOrderStatus(),
                 order.getCreateAt(),
-                order.getDeliveryAddress(),
+                addressDTOMapper.apply(order.getDeliveryAddress()),
                 orderItemDTOS,
                 order.getTotalItem(),
                 order.getTotalPrice()

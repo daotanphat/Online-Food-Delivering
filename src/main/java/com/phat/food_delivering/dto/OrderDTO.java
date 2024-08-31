@@ -12,7 +12,7 @@ public record OrderDTO(
         Long totalAmount,
         String status,
         Date createAt,
-        Address deliveryAddress,
+        AddressDTO deliveryAddress,
         List<OrderItemDTO> items,
         int totalItem,
         Long totalPrice
