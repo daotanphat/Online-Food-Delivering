@@ -1,9 +1,6 @@
 package com.phat.food_delivering.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,7 +14,7 @@ import java.util.Objects;
 public class Address {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     private String streetAddress;
@@ -25,6 +22,9 @@ public class Address {
     private String stateProvince;
     private Long postalCode;
     private String country;
+
+    @OneToOne(mappedBy = "address")
+    private User user;
 
     @Override
     public boolean equals(Object o) {

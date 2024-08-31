@@ -12,4 +12,6 @@ public interface AddressService {
     public boolean checkDuplicateAddress(Address address, List<Address> addresses);
 
     public Address findAddress(Address address);
+
+    Address getAddressById(Long id);
 }

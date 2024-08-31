@@ -1,11 +1,14 @@
 package com.phat.food_delivering.service;
 
+import com.phat.food_delivering.exception.EntityNotFoundException;
 import com.phat.food_delivering.model.Address;
+import com.phat.food_delivering.model.Food;
 import com.phat.food_delivering.repository.AddressRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AddressServiceImpl implements AddressService {
@@ -47,5 +50,19 @@ public class AddressServiceImpl implements AddressService {
                 address.getPostalCode(),
                 address.getCountry()
         );
+    }
+
+    @Override
+    public Address getAddressById(Long id) {
+        Optional<Address> address = addressRepository.findById(id);
+        return unwrappedFood(address, id);
+    }
+
+    static Address unwrappedFood(Optional<Address> entity, Long id) {
+        if (entity.isPresent()) {
+            return entity.get();
+        } else {
+            throw new EntityNotFoundException(Address.class, id);
+        }
     }
 }
