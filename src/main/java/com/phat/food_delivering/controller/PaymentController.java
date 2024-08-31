@@ -2,9 +2,12 @@ package com.phat.food_delivering.controller;
 
 import com.phat.food_delivering.config.VnpayConfig;
 import com.phat.food_delivering.dto.CartDTO;
+import com.phat.food_delivering.dto.OrderDTO;
 import com.phat.food_delivering.dto.PaymentDTO;
 import com.phat.food_delivering.dto.TransactionStatusDTO;
+import com.phat.food_delivering.model.Order;
 import com.phat.food_delivering.service.CartService;
+import com.phat.food_delivering.service.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,6 +25,7 @@ import java.util.*;
 @RequestMapping("/api/payment")
 public class PaymentController {
     private CartService cartService;
+    private OrderService orderService;
 
     @GetMapping("/create_payment")
     public ResponseEntity<?> createPayment(HttpServletRequest request,
@@ -98,17 +102,21 @@ public class PaymentController {
             @RequestParam(value = "vnp_Amount") String amount,
             @RequestParam(value = "vnp_BankCode") String bankCode,
             @RequestParam(value = "vnp_OrderInfo") String order,
-            @RequestParam(value = "vnp_ResponseCode") String responseCode
+            @RequestParam(value = "vnp_ResponseCode") String responseCode,
+            @RequestHeader("Authorization") String token
     ) {
         TransactionStatusDTO transactionStatusDTO = new TransactionStatusDTO();
+        OrderDTO orderDTO = orderService.getUserOrder(token).get(0);
         if (responseCode.equals("00")) {
             transactionStatusDTO.setStatus("OK");
             transactionStatusDTO.setMessage("Successfully!");
             transactionStatusDTO.setData("");
+            orderService.updateOrderStatus(orderDTO.id(), "COMPLETED");
         } else {
             transactionStatusDTO.setStatus("No");
             transactionStatusDTO.setMessage("Failed!");
             transactionStatusDTO.setData("");
+            orderService.cancelOrder(orderDTO.id());
         }
         return ResponseEntity.status(HttpStatus.OK).body(transactionStatusDTO);
     }
