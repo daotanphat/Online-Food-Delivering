@@ -19,8 +19,10 @@ public class CartDTOMapper implements Function<Cart, CartDTO> {
     @Override
     public CartDTO apply(Cart cart) {
         List<CartItemDTO> cartItemDTOS = new ArrayList<>();
-        for(CartItem cartItem : cart.getItems()){
-            cartItemDTOS.add(cartItemDTOMapper.apply(cartItem));
+        if(cart.getItems() != null) {
+            for (CartItem cartItem : cart.getItems()) {
+                cartItemDTOS.add(cartItemDTOMapper.apply(cartItem));
+            }
         }
         return new CartDTO(
                 cart.getId(),

@@ -130,6 +130,9 @@ public class CartServiceImpl implements CartService {
         token = token.replace(SecurityConstants.BEARER, "");
         User user = userService.findUserBasedOnToken(token);
         Cart cart = cartRepository.findByCustomerId(user.getId());
+        if (cart == null) {
+            return CartDTO.noArgConstructor();
+        }
         return cartDTOMapper.apply(cartRepository.findByCustomerId(user.getId()));
     }
 
