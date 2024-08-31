@@ -1,6 +1,8 @@
 package com.phat.food_delivering.service;
 
+import com.phat.food_delivering.dto.AddressDTO;
 import com.phat.food_delivering.model.Address;
+import com.phat.food_delivering.request.AddressRequest;
 
 import java.util.List;
 
@@ -9,9 +11,9 @@ public interface AddressService {
 
     public List<Address> getAddresses();
 
-    public boolean checkDuplicateAddress(Address address, List<Address> addresses);
+    public boolean checkDuplicateAddress(AddressDTO address, List<Address> addresses);
 
-    public Address findAddress(Address address);
+    public AddressDTO findAddress(Address address);
 
     Address getAddressById(Long id);
 }

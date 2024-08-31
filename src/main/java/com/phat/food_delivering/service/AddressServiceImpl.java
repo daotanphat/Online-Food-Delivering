@@ -1,9 +1,12 @@
 package com.phat.food_delivering.service;
 
+import com.phat.food_delivering.dto.AddressDTO;
+import com.phat.food_delivering.dto.Mapper.AddressDTOMapper;
 import com.phat.food_delivering.exception.EntityNotFoundException;
 import com.phat.food_delivering.model.Address;
 import com.phat.food_delivering.model.Food;
 import com.phat.food_delivering.repository.AddressRepository;
+import com.phat.food_delivering.request.AddressRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +19,9 @@ public class AddressServiceImpl implements AddressService {
     @Autowired
     AddressRepository addressRepository;
 
+    @Autowired
+    AddressDTOMapper addressDTOMapper;
+
     @Override
     public Address save(Address address) {
         return addressRepository.save(address);
@@ -27,7 +33,7 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public boolean checkDuplicateAddress(Address address, List<Address> addresses) {
+    public boolean checkDuplicateAddress(AddressDTO address, List<Address> addresses) {
         for (Address address1 : addresses) {
             if (address1.getStreetAddress().equalsIgnoreCase(address.getStreetAddress())
                     && address1.getCity().equalsIgnoreCase(address.getCity())
@@ -42,14 +48,15 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public Address findAddress(Address address) {
-        return addressRepository.findByStreetAddressAndCityAndStateProvinceAndPostalCodeAndCountry(
+    public AddressDTO findAddress(Address address) {
+        Address address1 = addressRepository.findByStreetAddressAndCityAndStateProvinceAndPostalCodeAndCountry(
                 address.getStreetAddress(),
                 address.getCity(),
                 address.getStateProvince(),
                 address.getPostalCode(),
                 address.getCountry()
         );
+        return addressDTOMapper.apply(address1);
     }
 
     @Override

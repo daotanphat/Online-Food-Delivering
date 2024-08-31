@@ -21,7 +21,7 @@ public class AddressDTOMapper implements Function<Address, AddressDTO> {
         );
     }
 
-    public Address toAddress(AddressRequest request) {
+    public Address toAddress(AddressDTO request) {
         Address address = new Address();
         address.setStreetAddress(request.getStreetAddress());
         address.setStateProvince(request.getStateProvince());
