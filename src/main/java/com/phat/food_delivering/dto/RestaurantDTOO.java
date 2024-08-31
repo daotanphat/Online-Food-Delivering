@@ -19,4 +19,10 @@ public record RestaurantDTOO(
         boolean open,
         List<CategoryDTO> categories
 ) {
+    // Static method to create a no-args RestaurantDTOO
+    public static RestaurantDTOO noArgConstructor() {
+        return new RestaurantDTOO(
+                null, null, "", "", "", null, null, "", List.of(), LocalDateTime.now(), false, List.of()
+        );
+    }
 }
