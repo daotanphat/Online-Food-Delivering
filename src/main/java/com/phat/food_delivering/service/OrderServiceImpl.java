@@ -1,14 +1,14 @@
 package com.phat.food_delivering.service;
 
+import com.phat.food_delivering.dto.AddressDTO;
 import com.phat.food_delivering.dto.CartDTO;
+import com.phat.food_delivering.dto.Mapper.AddressDTOMapper;
 import com.phat.food_delivering.dto.Mapper.OrderDTOMapper;
 import com.phat.food_delivering.dto.OrderDTO;
 import com.phat.food_delivering.exception.EntityNotFoundException;
 import com.phat.food_delivering.model.*;
-import com.phat.food_delivering.repository.OrderItemRepository;
-import com.phat.food_delivering.repository.OrderRepository;
-import com.phat.food_delivering.repository.RestaurantRepository;
-import com.phat.food_delivering.repository.UserRepository;
+import com.phat.food_delivering.repository.*;
+import com.phat.food_delivering.request.AddressRequest;
 import com.phat.food_delivering.request.OrderRequest;
 import com.phat.food_delivering.response.MessageResponse;
 import com.phat.food_delivering.security.SecurityConstants;
@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 public class OrderServiceImpl implements OrderService {
     private final UserRepository userRepository;
     private final OrderItemRepository orderItemRepository;
+    private final CartRepository cartRepository;
     OrderRepository orderRepository;
     UserService userService;
     RestaurantService restaurantService;
@@ -33,6 +34,8 @@ public class OrderServiceImpl implements OrderService {
     AddressService addressService;
     CartService cartService;
     OrderDTOMapper orderDTOMapper;
+    AddressDTOMapper addressDTOMapper;
+    CartItemRepository cartItemRepository;
 
 
     @Override
@@ -40,17 +43,7 @@ public class OrderServiceImpl implements OrderService {
         token = token.replace(SecurityConstants.BEARER, "");
         User user = userService.findUserBasedOnToken(token);
         Restaurant restaurant = restaurantService.findRestaurantById(request.getRestaurantId());
-        Address shipAddress = request.getShipAddress();
-        List<Address> addresses = addressService.getAddresses();
-        if (!addressService.checkDuplicateAddress(shipAddress, addresses)) {
-            addressService.save(shipAddress);
-        } else {
-            shipAddress = addressService.findAddress(shipAddress);
-        }
-        if (!addressService.checkDuplicateAddress(shipAddress, user.getAddresses())) {
-            user.getAddresses().add(shipAddress);
-            userRepository.save(user);
-        }
+
         CartDTO cartDTO = cartService.findCartByUserId(token);
         Cart cart = cartService.findCartById(cartDTO.id());
 
@@ -59,7 +52,7 @@ public class OrderServiceImpl implements OrderService {
         order.setRestaurant(restaurant);
         order.setOrderStatus("PENDING");
         order.setCreateAt(new Date());
-        order.setDeliveryAddress(shipAddress);
+        order.setDeliveryAddress(user.getAddress());
 
         List<OrderItem> orderItems = new ArrayList<>();
         for (CartItem item : cart.getItems()) {
@@ -71,6 +64,7 @@ public class OrderServiceImpl implements OrderService {
 
             OrderItem savedOrderItem = orderItemRepository.save(orderItem);
             orderItems.add(savedOrderItem);
+            cartItemRepository.delete(item);
         }
         order.setItems(orderItems);
         order.setTotalItem(cart.getItems().size());
@@ -106,9 +100,9 @@ public class OrderServiceImpl implements OrderService {
     public List<OrderDTO> getUserOrder(String token) {
         token = token.replace(SecurityConstants.BEARER, "");
         User user = userService.findUserBasedOnToken(token);
-        List<Order> orders = orderRepository.findOrderByCustomerId(user.getId());
+        List<Order> orders = orderRepository.findOrderByCustomerIdOrderByCreateAtDesc(user.getId());
         List<OrderDTO> orderDTOS = new ArrayList<>();
-        for(Order order: orders){
+        for (Order order : orders) {
             OrderDTO orderDTO = orderDTOMapper.apply(order);
             orderDTOS.add(orderDTO);
         }
@@ -132,7 +126,7 @@ public class OrderServiceImpl implements OrderService {
             }
         }
         List<OrderDTO> orderDTOS = new ArrayList<>();
-        for(Order order: orders){
+        for (Order order : orders) {
             OrderDTO orderDTO = orderDTOMapper.apply(order);
             orderDTOS.add(orderDTO);
         }
